@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MyApp {
-  /// ==============  Strings  ===============
+  /// ==============  Strings  ================
   static const String kAppTitle = 'Peak Property';
   static const String kAppTitle2 = 'P.P.';
   static const String welcomeTxt = 'Welcome to';
