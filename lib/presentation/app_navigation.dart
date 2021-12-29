@@ -3,21 +3,26 @@ import 'dart:async';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:peak_property/core/my_app.dart';
+import 'package:peak_property/custom/custom_drawer.dart';
+import 'package:peak_property/presentation/alerts/alerts.dart';
+import 'package:peak_property/presentation/profile/profile.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+import 'bookmark/bookmark.dart';
+import 'home/home.dart';
+
+class AppNavigation extends StatefulWidget {
+  const AppNavigation({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<AppNavigation> createState() => _AppNavigationState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class _AppNavigationState extends State<AppNavigation>
     with SingleTickerProviderStateMixin {
+
   final autoSizeGroup = AutoSizeGroup();
   var _bottomNavIndex = 0;
 
@@ -32,22 +37,23 @@ class _HomeScreenState extends State<HomeScreen>
     Icons.account_circle_sharp,
   ];
 
+  static const List<Widget> _children =  <Widget>[
+    Home(),
+    Bookmark(),
+    Notifications(),
+    Profile(),
+  ];
+
   final navList = <String>[
-    'Home',
-    'Bookmark',
-    'Alerts',
-    'Profile',
+    MyApp.home,
+    MyApp.bookmark,
+    MyApp.alerts,
+    MyApp.profile,
   ];
 
   @override
   void initState() {
     super.initState();
-    // final systemTheme = SystemUiOverlayStyle.light.copyWith(
-    //   systemNavigationBarColor: HexColor('#373A36'),
-    //   systemNavigationBarIconBrightness: Brightness.light,
-    // );
-    // SystemChrome.setSystemUIOverlayStyle(systemTheme);
-
     _animationController = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
@@ -75,54 +81,23 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      drawer: Drawer(
-        child: ListView(
-          children: const [
-            DrawerHeader(
-              child: Icon(
-                Icons.account_circle_sharp,
-                size: 150.0,
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.article),
-              title: Text('Feedback'),
-            ),
-            ListTile(
-              leading: Icon(FontAwesomeIcons.solidStar),
-              title: Text('Rate Us'),
-            ),
-            ListTile(
-              leading: Icon(FontAwesomeIcons.signOutAlt),
-              title: Text('Log Out'),
-            ),
-            ListTile(
-              leading: Icon(FontAwesomeIcons.ethereum),
-              title: Text('About Us'),
-            )
-          ],
-        ),
-      ),
+      endDrawer: const MyDrawer(),
       appBar: AppBar(
-        title: const Text(
-          'This is home',
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          navList[_bottomNavIndex],
+          style: const TextStyle(color: Colors.black),
+        ),
+        leading: const Icon(
+          FontAwesomeIcons.search,
+          size: MyApp.kDefaultIconSize - 5,
+          color: Colors.black,
         ),
         iconTheme: const IconThemeData(color: Colors.black),
         backgroundColor: MyApp.kDefaultBackgroundColorWhite,
         centerTitle: true,
-        actions: const [
-          Icon(
-            FontAwesomeIcons.search,
-            size: MyApp.kDefaultIconSize - 5,
-            color: Colors.black,
-          ),
-        ],
         elevation: 0.5,
       ),
-      body: NavigationScreen(
-        iconData: iconList[_bottomNavIndex],
-      ),
+      body: IndexedStack(children: _children, index: _bottomNavIndex),
       floatingActionButton: ScaleTransition(
         scale: animation,
         child: FloatingActionButton(
@@ -148,8 +123,6 @@ class _HomeScreenState extends State<HomeScreen>
         splashSpeedInMilliseconds: 300,
         notchSmoothness: NotchSmoothness.smoothEdge,
         gapLocation: GapLocation.center,
-        // leftCornerRadius: 32,
-        // rightCornerRadius: 32,
         onTap: (index) => setState(() => _bottomNavIndex = index),
         tabBuilder: (int index, bool isActive) {
           final color = isActive ? MyApp.kDefaultTextColorBlack : Colors.grey;
@@ -178,81 +151,81 @@ class _HomeScreenState extends State<HomeScreen>
       ),
     );
   }
-
 }
 
-class NavigationScreen extends StatefulWidget {
-  final IconData iconData;
-
-  const NavigationScreen({Key? key, required this.iconData}) : super(key: key);
-
-  @override
-  _NavigationScreenState createState() => _NavigationScreenState();
-}
-
-class _NavigationScreenState extends State<NavigationScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> animation;
-
-  @override
-  void didUpdateWidget(NavigationScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.iconData != widget.iconData) {
-      _startAnimation();
-    }
-  }
-
-  @override
-  void initState() {
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-    animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    );
-    _controller.forward();
-    super.initState();
-  }
-
-  _startAnimation() {
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-    animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    );
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: CircularRevealAnimation(
-          animation: animation,
-          centerOffset: const Offset(80, 80),
-          maxRadius: MediaQuery.of(context).size.longestSide * 1.1,
-          child: Icon(
-            widget.iconData,
-            color: HexColor('#FFA400'),
-            size: 160,
-          ),
-        ),
-      ),
-    );
-  }
-}
+// class NavigationScreen extends StatefulWidget {
+//   final IconData iconData;
+//
+//   const NavigationScreen({Key? key, required this.iconData}) : super(key: key);
+//
+//   @override
+//   _NavigationScreenState createState() => _NavigationScreenState();
+// }
+//
+// class _NavigationScreenState extends State<NavigationScreen>
+//     with TickerProviderStateMixin {
+//
+//   late AnimationController _controller;
+//   late Animation<double> animation;
+//
+//   @override
+//   void didUpdateWidget(NavigationScreen oldWidget) {
+//     super.didUpdateWidget(oldWidget);
+//     if (oldWidget.iconData != widget.iconData) {
+//       _startAnimation();
+//     }
+//   }
+//
+//   @override
+//   void initState() {
+//     _controller = AnimationController(
+//       vsync: this,
+//       duration: const Duration(milliseconds: 1000),
+//     );
+//     animation = CurvedAnimation(
+//       parent: _controller,
+//       curve: Curves.easeIn,
+//     );
+//     _controller.forward();
+//     super.initState();
+//   }
+//
+//   _startAnimation() {
+//     _controller = AnimationController(
+//       vsync: this,
+//       duration: const Duration(milliseconds: 1000),
+//     );
+//     animation = CurvedAnimation(
+//       parent: _controller,
+//       curve: Curves.easeIn,
+//     );
+//     _controller.forward();
+//   }
+//
+//   @override
+//   void dispose() {
+//     _controller.dispose();
+//     super.dispose();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Center(
+//         child: CircularRevealAnimation(
+//           animation: animation,
+//           centerOffset: const Offset(80, 80),
+//           maxRadius: MediaQuery.of(context).size.longestSide * 1.1,
+//           child: Icon(
+//             widget.iconData,
+//             color: HexColor('#FFA400'),
+//             size: 160,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class HexColor extends Color {
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));

@@ -2,10 +2,10 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:peak_property/core/my_app.dart';
+import 'package:peak_property/custom/custom_button.dart';
+import 'package:peak_property/core/routes.dart';
 
 class SignInScreen extends StatefulWidget {
-  static const String routeName = "/signIn_screen";
-
   const SignInScreen({Key? key}) : super(key: key);
 
   @override
@@ -164,32 +164,19 @@ class _SignInScreenState extends State<SignInScreen> {
                         const SizedBox(height: MyApp.kDefaultPadding * 2),
 
                         //======================SIGNIN BUTTON===================
-
-                        GestureDetector(
+                        CustomButton(
+                          width: double.infinity,
+                          label: _isForgetPasswordPressed
+                              ? MyApp.verifyTxt
+                              : MyApp.signInTxt,
+                          padding: MyApp.kDefaultPadding / 1.5,
                           onTap: () {
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  Routes.appNavigation, (route) => false);
                             }
                           },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: MyApp.kDefaultPadding * 0.8),
-                            decoration: BoxDecoration(
-                              color: MyApp.kDefaultButtonColorBlack,
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            child: Center(
-                              child: Text(
-                                _isForgetPasswordPressed
-                                    ? MyApp.verifyTxt
-                                    : MyApp.signInTxt,
-                                style: const TextStyle(
-                                  color: MyApp.kDefaultTextColorWhite,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
                         ),
                       ],
                     ),
@@ -206,27 +193,13 @@ class _SignInScreenState extends State<SignInScreen> {
                       const Text(MyApp.continueWithTxt),
                       const SizedBox(height: MyApp.kDefaultPadding),
                       Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              icon: const Icon(
-                                FontAwesomeIcons.facebook,
-                                size: MyApp.kDefaultFontSize * 3,
-                                color: MyApp.kDefaultFacebookIconColor,
-                              ),
-                              onPressed: () => {},
-                            ),
-                            const SizedBox(width: MyApp.kDefaultPadding * 2),
-                            IconButton(
-                              icon: const Icon(
-                                FontAwesomeIcons.google,
-                                size: (MyApp.kDefaultFontSize * 3) - 3,
-                                color: MyApp.kDefaultGoogleIconColor,
-                              ),
-                              onPressed: () => {},
-                            ),
-                          ],
+                        child: IconButton(
+                          icon: const Icon(
+                            FontAwesomeIcons.google,
+                            size: (MyApp.kDefaultFontSize * 3) - 3,
+                            color: MyApp.kDefaultGoogleIconColor,
+                          ),
+                          onPressed: () => {},
                         ),
                       ),
                       const SizedBox(height: MyApp.kDefaultPadding * 5),
@@ -234,12 +207,16 @@ class _SignInScreenState extends State<SignInScreen> {
                       // ============ Don't Have Account =================
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(MyApp.doNotHaveAnAccountTxt),
-                          Text(
-                            MyApp.registrationTxt,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                        children: [
+                          const Text(MyApp.doNotHaveAnAccountTxt),
+                          InkWell(
+                            onTap: () => Navigator.of(context)
+                                .pushNamed(Routes.registration),
+                            child: const Text(
+                              MyApp.registrationTxt,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],

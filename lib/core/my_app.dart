@@ -24,12 +24,20 @@ class MyApp {
   static const String orContinueWithTxt = 'Or continue with';
   static const String forgetPasswordTxt = 'Do not remember the password?';
 
+  static const String home = 'Home';
+  static const String bookmark = 'Bookmark';
+  static const String alerts = 'Alerts';
+  static const String profile = 'Profile';
+
+  static const String fixed = 'Fixed';
+  static const String bid = 'Bid';
+
   static const String scaffoldMsg = '  Please agree to terms.';
 
   /// =============== Errors ==================
   static const String invalidNameError = 'Invalid name';
   static const String invalidEmailError = 'Invalid email';
-  static const String invalidPassError = ' 1 Upper case, 1 lowercase, 1 digit';
+  static const String invalidPassError = ' 1 Upper case, 1 Lowercase, 1 Digit';
 
   /// ==============  Numbers  ===============
   static const double kDefaultPadding = 16;
