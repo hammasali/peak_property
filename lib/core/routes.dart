@@ -3,7 +3,7 @@ import 'package:peak_property/auth/login/login_screen.dart';
 import 'package:peak_property/auth/register/register_screen.dart';
 import 'package:peak_property/auth/signIn/signin_screen.dart';
 import 'package:peak_property/presentation/app_navigation.dart';
-
+import 'package:peak_property/presentation/home/fixed/fixed_detail.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -11,7 +11,8 @@ class Routes {
   static const String loginRoot = 'login/';
   static const String registration = 'login/registration';
   static const String signIn = 'login/signIn';
-  static const String appNavigation = '/appNavigation';
+  static const String appNavigation = 'login/appNavigation';
+  static const String fixedDetails = 'login/fixedDetails';
 }
 
 class RouteNavigator extends StatelessWidget {
@@ -29,7 +30,7 @@ class RouteNavigator extends StatelessWidget {
       },
       child: Navigator(
         key: navigatorKey,
-        initialRoute: Routes.loginRoot,
+        initialRoute: Routes.appNavigation,
         onGenerateRoute: (RouteSettings settings) {
           late WidgetBuilder builder;
           switch (settings.name) {
@@ -47,6 +48,12 @@ class RouteNavigator extends StatelessWidget {
 
             case Routes.appNavigation:
               builder = (BuildContext _) => const AppNavigation();
+              break;
+
+            case Routes.fixedDetails:
+              builder = (BuildContext _) => FixedDetailScreen(
+                    hero: settings.arguments as String,
+                  );
               break;
           }
           return MaterialPageRoute(builder: builder, settings: settings);

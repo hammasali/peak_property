@@ -26,6 +26,14 @@ class AppTheme {
           color: Colors.black,
           fontWeight: FontWeight.bold,
         ),
+        bodyText2: TextStyle(
+          color: Colors.grey,
+          fontSize: 16.0
+        ),
+        headline4: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
         headline6: TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.bold,
