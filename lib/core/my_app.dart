@@ -27,6 +27,8 @@ class MyApp {
   static const String home = 'Home';
   static const String bookmark = 'Bookmark';
   static const String alerts = 'Alerts';
+  static const String chat = 'Chat';
+
   static const String profile = 'Profile';
 
   static const String fixed = 'Fixed';

@@ -4,7 +4,9 @@ import 'package:peak_property/core/routes.dart';
 import 'package:peak_property/dummy.dart';
 
 class Fixed extends StatelessWidget {
-  const Fixed({Key? key}) : super(key: key);
+  bool? isBookmarked = false;
+
+  Fixed({Key? key, this.isBookmarked}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +14,9 @@ class Fixed extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       itemCount: data.length,
       shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(vertical: 80),
+      padding: isBookmarked!
+          ? const EdgeInsets.only(top: 5, bottom: 80)
+          : const EdgeInsets.symmetric(vertical: 80),
       itemBuilder: (context, index) {
         final _data = data[index];
 
@@ -90,7 +94,7 @@ class Fixed extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     child: Text(
                       _data.time,
-                      style: TextStyle(fontSize: 12.0),
+                      style: const TextStyle(fontSize: 12.0),
                     ))
               ],
             ),

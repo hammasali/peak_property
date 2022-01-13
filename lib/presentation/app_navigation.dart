@@ -2,15 +2,15 @@ import 'dart:async';
 
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:peak_property/core/my_app.dart';
-import 'package:peak_property/custom/custom_drawer.dart';
+import 'package:peak_property/drawer/custom_drawer.dart';
 import 'package:peak_property/presentation/alerts/alerts.dart';
-import 'package:peak_property/presentation/profile/profile.dart';
+import 'package:peak_property/presentation/chat/chats_page.dart';
 
 import 'bookmark/bookmark.dart';
+import 'home/fixed/fixed.dart';
 import 'home/home.dart';
 
 class AppNavigation extends StatefulWidget {
@@ -22,7 +22,6 @@ class AppNavigation extends StatefulWidget {
 
 class _AppNavigationState extends State<AppNavigation>
     with SingleTickerProviderStateMixin {
-
   final autoSizeGroup = AutoSizeGroup();
   var _bottomNavIndex = 0;
 
@@ -34,21 +33,22 @@ class _AppNavigationState extends State<AppNavigation>
     FontAwesomeIcons.home,
     Icons.bookmark,
     FontAwesomeIcons.solidBell,
-    Icons.account_circle_sharp,
+    Icons.chat_bubble_rounded,
   ];
 
-  static const List<Widget> _children =  <Widget>[
-    Home(),
-    Bookmark(),
-    Notifications(),
-    Profile(),
+  static  final List<Widget> _children = <Widget>[
+    const Home(),
+    // Bookmark(),
+    Fixed(isBookmarked: true),
+    const Notifications(),
+    const ChatsPage(),
   ];
 
   final navList = <String>[
     MyApp.home,
     MyApp.bookmark,
     MyApp.alerts,
-    MyApp.profile,
+    MyApp.chat,
   ];
 
   @override
