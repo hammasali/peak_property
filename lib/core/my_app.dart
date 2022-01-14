@@ -34,6 +34,29 @@ class MyApp {
   static const String fixed = 'Fixed';
   static const String bid = 'Bid';
 
+  static const String viewProfile = 'View Profile';
+  static const String editProfile = 'Edit Profile';
+  static const String feedback = 'Feedback';
+  static const String rateUs = 'Rate Us';
+  static const String logout = 'Logout';
+  static const String aboutUs = 'About Us';
+
+  static const String about = 'About';
+
+  static const String confirm = 'Confirm';
+  static const String confirmationText = 'Are you sure you wish to delete this item?';
+  static const String cancel = 'Cancel';
+  static const String delete = 'Delete';
+
+  static const String myProfile = 'My Profile';
+  static const String profileInfo = 'Profile Info';
+  static const String fullName = 'Full Name';
+  static const String username = 'Username';
+  static const String bio = 'Bio';
+  static const String emailAddress = 'Email Address';
+  static const String aboutHint = 'Tell something about property...';
+  static const String saveProfile = 'Save Profile';
+
   static const String scaffoldMsg = '  Please agree to terms.';
 
   /// =============== Errors ==================
@@ -62,4 +85,6 @@ class MyApp {
   static const Color kDefaultButtonColorBlack = Color(0xDD000000);
 
   static const Color kDefaultCheckColor = Color(0xff4caf50);
+
+
 }

@@ -9,7 +9,7 @@ class AppTheme {
       errorColor: const Color(0xffe80202),
       colorScheme: ThemeData()
           .colorScheme
-          .copyWith(primaryVariant: const Color(0xff14a69c)),
+          .copyWith(primaryVariant: const Color(0xff14a69c),secondary: Colors.grey),
       appBarTheme: const AppBarTheme(
         iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Colors.white,

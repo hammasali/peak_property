@@ -39,6 +39,8 @@ dependencies:
   auto_size_text: ^3.0.0
   circular_reveal_animation: ^2.0.0
   animation_wrappers: ^3.0.0
+  flutter_rating_bar: ^4.0.0
+
 
 
 dev_dependencies:

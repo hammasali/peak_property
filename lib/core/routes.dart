@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:peak_property/auth/login/login_screen.dart';
 import 'package:peak_property/auth/register/register_screen.dart';
 import 'package:peak_property/auth/signIn/signin_screen.dart';
+import 'package:peak_property/drawer/edit_profile/edit_profile.dart';
 import 'package:peak_property/drawer/profile/profile.dart';
 import 'package:peak_property/presentation/app_navigation.dart';
 import 'package:peak_property/presentation/chat/chat_screen.dart';
@@ -17,6 +18,8 @@ class Routes {
   static const String fixedDetails = '/fixedDetails';
   static const String conversationScreen = '/conversationScreen';
   static const String profile = '/profile';
+  static const String editProfile = '/editProfile';
+
 
 
 }
@@ -68,6 +71,10 @@ class RouteNavigator extends StatelessWidget {
 
             case Routes.profile:
               builder = (BuildContext _) =>  const Profile();
+              break;
+
+            case Routes.editProfile:
+              builder = (BuildContext _) =>  const EditProfile();
               break;
           }
           return MaterialPageRoute(builder: builder, settings: settings);
