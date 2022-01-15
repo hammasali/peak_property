@@ -7,6 +7,7 @@ import 'package:peak_property/drawer/profile/profile.dart';
 import 'package:peak_property/presentation/app_navigation.dart';
 import 'package:peak_property/presentation/chat/chat_screen.dart';
 import 'package:peak_property/presentation/home/fixed/fixed_detail.dart';
+import 'package:peak_property/presentation/upload/upload.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -19,9 +20,7 @@ class Routes {
   static const String conversationScreen = '/conversationScreen';
   static const String profile = '/profile';
   static const String editProfile = '/editProfile';
-
-
-
+  static const String upload = '/upload';
 }
 
 class RouteNavigator extends StatelessWidget {
@@ -75,6 +74,10 @@ class RouteNavigator extends StatelessWidget {
 
             case Routes.editProfile:
               builder = (BuildContext _) =>  const EditProfile();
+              break;
+
+            case Routes.upload:
+              builder = (BuildContext _) =>  const Upload();
               break;
           }
           return MaterialPageRoute(builder: builder, settings: settings);

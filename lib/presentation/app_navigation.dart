@@ -5,6 +5,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:peak_property/core/my_app.dart';
+import 'package:peak_property/core/routes.dart';
 import 'package:peak_property/drawer/custom_drawer.dart';
 import 'package:peak_property/presentation/alerts/alerts.dart';
 import 'package:peak_property/presentation/chat/chats_page.dart';
@@ -36,7 +37,7 @@ class _AppNavigationState extends State<AppNavigation>
     Icons.chat_bubble_rounded,
   ];
 
-  static  final List<Widget> _children = <Widget>[
+  static final List<Widget> _children = <Widget>[
     const Home(),
     // Bookmark(),
     const Bookmark(),
@@ -110,6 +111,7 @@ class _AppNavigationState extends State<AppNavigation>
           onPressed: () {
             _animationController.reset();
             _animationController.forward();
+            Navigator.of(context).pushNamed(Routes.upload);
           },
         ),
       ),
