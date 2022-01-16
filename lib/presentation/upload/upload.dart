@@ -11,6 +11,24 @@ class Upload extends StatefulWidget {
 }
 
 class _UploadState extends State<Upload> {
+  String _selectedAreaUnit = 'Marla';
+
+  var currentIndex = 0;
+
+  double currentArea = 300;
+  double minArea = 0;
+  double maxArea = 1000;
+  double areaDivision = 20;
+
+  double _starValue = 90000;
+  double _endValue = 800000;
+  double minValue = 0.0;
+  double maxValue = 1000000.0;
+
+  TextEditingController startController = TextEditingController();
+  TextEditingController endController = TextEditingController();
+  TextEditingController areaController = TextEditingController();
+
   final types = {
     'Homes': [
       'House',
@@ -37,12 +55,32 @@ class _UploadState extends State<Upload> {
       'Building',
     ]
   };
-  var currentIndex = 0;
+  final List<String> _areaUnit = [
+    'Square Feet (sq.ft.)',
+    'Square Meters (sq.m.)',
+    'Square Yards (sq.yd.)',
+    'Marla',
+    'Kanal'
+  ]; // Option 2
+  @override
+  void initState() {
+    super.initState();
+    startController.addListener(_setStartValue);
+    endController.addListener(_setEndValue);
+    areaController.addListener(_setAreaValue);
+  }
+
+  @override
+  void dispose() {
+    startController.dispose();
+    endController.dispose();
+    areaController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final mediaQuery = MediaQuery.of(context);
 
     final myAppBar = AppBar(
       centerTitle: true,
@@ -62,10 +100,6 @@ class _UploadState extends State<Upload> {
       elevation: 0,
     );
 
-    final bheight = mediaQuery.size.height -
-        mediaQuery.padding.top -
-        myAppBar.preferredSize.height;
-
     return Scaffold(
       appBar: myAppBar,
       backgroundColor: MyApp.kDefaultBackgroundColorWhite,
@@ -75,24 +109,19 @@ class _UploadState extends State<Upload> {
           children: [
             propertyPhoto(),
             const Divider(thickness: 2.0),
-            properType(),
+            propertyType(),
             const Divider(thickness: 2.0),
-            customText('Price Range'),
-
-
+            priceRange(),
+            const Divider(thickness: 2.0),
+            propertyArea(),
+            const Divider(thickness: 2.0),
           ],
         ),
       ),
     );
   }
 
-  customText(String text) {
-    return Padding(
-      padding: const EdgeInsets.all(MyApp.kDefaultPadding),
-      child: Text(text, style: Theme.of(context).textTheme.headline6),
-    );
-  }
-
+  ///  =======================  PROPERTY PHOTO  ======================
   propertyPhoto() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       customText("Property Photo"),
@@ -189,7 +218,8 @@ class _UploadState extends State<Upload> {
     ]);
   }
 
-  properType() {
+  ///  =======================  PROPERTY TYPE  ======================
+  propertyType() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -222,6 +252,284 @@ class _UploadState extends State<Upload> {
         return CustomChip(title: types.values.last.toList());
       default:
         return CustomChip(title: types.values.elementAt(1).toList());
+    }
+  }
+
+  ///  =======================  PRICE RANGE  ======================
+  priceRange() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            customText('Price Range'),
+            const Text(
+              '(PKR)',
+              style: TextStyle(fontSize: 12.0),
+            )
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: startController,
+                  maxLength: 10,
+                  keyboardType: TextInputType.number,
+                  cursorColor: Colors.black,
+                  decoration: const InputDecoration(
+                    fillColor: Colors.black,
+                    isDense: true,
+                    hintText: '0',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    focusColor: Colors.black,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Text('TO', style: Theme.of(context).textTheme.bodyText2),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextFormField(
+                  controller: endController,
+                  maxLength: 10,
+                  keyboardType: TextInputType.number,
+                  cursorColor: Colors.black,
+                  decoration: const InputDecoration(
+                    fillColor: Colors.black,
+                    isDense: true,
+                    hintText: 'Any',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    focusColor: Colors.black,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10.0),
+        RangeSlider(
+          values: RangeValues(_starValue, _endValue),
+          min: minValue,
+          max: maxValue,
+          divisions: 200,
+          labels: RangeLabels(
+            range(_starValue.round()),
+            range(_endValue.round()),
+          ),
+          onChanged: (RangeValues values) {
+            setState(() {
+              _starValue = values.start.roundToDouble();
+              _endValue = values.end.roundToDouble();
+              startController.text = values.start.round().toString();
+              endController.text = values.end.round().toString();
+            });
+          },
+          activeColor: Colors.black,
+        ),
+      ],
+    );
+  }
+
+  ///  =======================  PROPERTY AREA  ======================
+  propertyArea() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            customText('Area Range'),
+            const Spacer(),
+            PopupMenuButton(
+                onSelected: (value) {
+                  setState(() {
+                    _selectedAreaUnit = value.toString();
+                  });
+                },
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                initialValue: _areaUnit[3],
+                itemBuilder: (context) {
+                  return _areaUnit
+                      .map(
+                        (value) => PopupMenuItem(
+                          value: value,
+                          child: Text(value),
+                        ),
+                      )
+                      .toList();
+                },
+                offset: const Offset(1, 40),
+                child: Container(
+                  padding: const EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.brown),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(10))),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(_selectedAreaUnit,
+                          style: const TextStyle(fontSize: 14.0)),
+                      const SizedBox(
+                        width: 3,
+                      ),
+                      const Icon(
+                        Icons.arrow_downward,
+                        size: 16.0,
+                      ),
+                    ],
+                  ),
+                )),
+            const SizedBox(width: 10.0)
+          ],
+        ),
+        Container(
+          height: 80,
+          width: 150,
+          padding:
+              const EdgeInsets.symmetric(horizontal: MyApp.kDefaultPadding),
+          child: Center(
+            child: TextFormField(
+              controller: areaController,
+              maxLength: 10,
+              keyboardType: TextInputType.number,
+              cursorColor: Colors.black,
+              decoration: const InputDecoration(
+                fillColor: Colors.black,
+                isDense: true,
+                hintText: '0',
+                hintStyle: TextStyle(color: Colors.grey),
+                focusColor: Colors.black,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Slider(
+          value: currentArea,
+          min: minArea,
+          max: maxArea,
+          divisions: 500,
+          label: unitArea(currentArea.round().toString(), _selectedAreaUnit),
+          // label: '${currentArea.round().toString()} Marla',
+          onChanged: (value) {
+            setState(() {
+              currentArea = value.roundToDouble();
+              areaController.text = value.round().toString();
+            });
+          },
+          activeColor: Colors.black,
+        ),
+      ],
+    );
+  }
+
+  ///  =================  WIDGETS  ===========================
+  customText(String text) {
+    return Padding(
+      padding: const EdgeInsets.all(MyApp.kDefaultPadding),
+      child: Text(text, style: Theme.of(context).textTheme.headline6),
+    );
+  }
+
+  _setStartValue() {
+    if (startController.text == '' || endController.text == '') return;
+    if (double.parse(startController.text).roundToDouble() <=
+            double.parse(endController.text).roundToDouble() &&
+        double.parse(startController.text).roundToDouble() >= minValue &&
+        double.parse(endController.text).roundToDouble() >= minValue &&
+        double.parse(startController.text).roundToDouble() <= maxValue &&
+        double.parse(endController.text).roundToDouble() <= maxValue) {
+      setState(() {
+        _starValue = double.parse(startController.text).roundToDouble();
+      });
+    }
+  }
+
+  _setEndValue() {
+    if (startController.text == '' || endController.text == '') return;
+
+    if (double.parse(startController.text).roundToDouble() <=
+            double.parse(endController.text).roundToDouble() &&
+        double.parse(startController.text).roundToDouble() >= minValue &&
+        double.parse(endController.text).roundToDouble() >= minValue &&
+        double.parse(startController.text).roundToDouble() <= maxValue &&
+        double.parse(endController.text).roundToDouble() <= maxValue) {
+      setState(() {
+        _endValue = double.parse(endController.text).roundToDouble();
+      });
+    }
+  }
+
+  _setAreaValue() {
+    if (areaController.text == '') return;
+    setState(() {
+      currentArea = double.parse(areaController.text).roundToDouble();
+    });
+  }
+
+  range(int price) {
+    if (price == 0) {
+      return 'PKR 0';
+    } else if (price < 10000) {
+      // 10 Thousand
+      return 'PKR 5 Thousand';
+    } else if (price < 100000) {
+      // 1 Lac
+      return 'PKR ${price.toString().substring(0, 2)} Thousand';
+    } else if (price < 1000000) {
+      // 10 Lac
+      final x = int.parse(price.toString().substring(0, 2)) / 10;
+      if (x.toString().split('.')[1] == '0') {
+        return 'PKR ${x.toInt()} Lac';
+      }
+      return 'PKR $x Lac';
+    } else {
+      return 'Any';
+    }
+  }
+
+  unitArea(String value, String unit) {
+    if (int.parse(value) >= 1000) {
+      return 'Any';
+    } else if (int.parse(value) == 0) {
+      return '0';
+    } else {
+      switch (unit) {
+        case 'Marla':
+          return '$value Marla';
+        case 'Square Feet (sq.ft.)':
+          return '$value sq.ft.';
+        case 'Square Meters (sq.m.)':
+          return '$value sq.m.';
+        case 'Square Yards (sq.yd.)':
+          return '$value sq.yd.';
+        case 'Kanal':
+          return '$value Kanal';
+      }
     }
   }
 }
