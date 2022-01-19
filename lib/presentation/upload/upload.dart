@@ -1,6 +1,8 @@
 import 'package:animation_wrappers/animation_wrappers.dart';
+import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:peak_property/core/my_app.dart';
+import 'package:peak_property/custom/custom_button.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class Upload extends StatefulWidget {
@@ -15,15 +17,29 @@ class _UploadState extends State<Upload> {
 
   var currentIndex = 0;
 
+  double currentBed = 3;
+  double minBed = 1;
+  double maxBed = 11;
+  int bedDivision = 10;
+
+  double currentBath = 2;
+  double minBath = 1;
+  double maxBath = 11;
+  int bathDivision = 10;
+
   double currentArea = 300;
   double minArea = 0;
   double maxArea = 1000;
-  double areaDivision = 20;
+  int areaDivision = 20;
 
   double _starValue = 90000;
   double _endValue = 800000;
   double minValue = 0.0;
   double maxValue = 1000000.0;
+
+  String? countryValue;
+  String? stateValue;
+  String? cityValue;
 
   TextEditingController startController = TextEditingController();
   TextEditingController endController = TextEditingController();
@@ -62,6 +78,7 @@ class _UploadState extends State<Upload> {
     'Marla',
     'Kanal'
   ]; // Option 2
+
   @override
   void initState() {
     super.initState();
@@ -109,12 +126,29 @@ class _UploadState extends State<Upload> {
           children: [
             propertyPhoto(),
             const Divider(thickness: 2.0),
+            location(),
+            const Divider(thickness: 2.0),
             propertyType(),
             const Divider(thickness: 2.0),
             priceRange(),
             const Divider(thickness: 2.0),
             propertyArea(),
             const Divider(thickness: 2.0),
+            currentIndex == 0 ? bedrooms() : Container(),
+            currentIndex == 0 ? const Divider(thickness: 2.0) : Container(),
+            currentIndex == 0 ? bathrooms() : Container(),
+            const Padding(
+              padding: EdgeInsets.all(MyApp.kDefaultPadding),
+              child: CustomButton(
+                label: 'Upload',
+                width: double.infinity,
+                icon: Icon(
+                  Icons.cloud_upload,
+                  color: Colors.white,
+                ),
+                textColor: Colors.white,
+              ),
+            ),
           ],
         ),
       ),
@@ -218,6 +252,101 @@ class _UploadState extends State<Upload> {
     ]);
   }
 
+  ///  =======================  LOCATION ======================
+  location() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        customText('Location'),
+        Padding(
+          padding: const EdgeInsets.only(
+              left: MyApp.kDefaultPadding,
+              right: MyApp.kDefaultPadding,
+              bottom: MyApp.kDefaultPadding),
+          child: CSCPicker(
+            showStates: true,
+            showCities: true,
+            flagState: CountryFlag.ENABLE,
+
+            ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
+            dropdownDecoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                color: Colors.white,
+                border: Border.all(color: Colors.grey.shade300, width: 1)),
+
+            ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
+            disabledDropdownDecoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                color: Colors.grey.shade300,
+                border: Border.all(color: Colors.grey.shade300, width: 1)),
+
+            ///placeholders for dropdown search field
+            countrySearchPlaceholder: "Country",
+            stateSearchPlaceholder: "State",
+            citySearchPlaceholder: "City",
+
+            ///labels for dropdown
+            countryDropdownLabel: "*Country",
+            stateDropdownLabel: "*State",
+            cityDropdownLabel: "*City",
+
+            ///Default Country
+            defaultCountry: DefaultCountry.Pakistan,
+
+            ///Disable country dropdown (Note: use it with default country)
+            disableCountry: true,
+
+            ///selected item style [OPTIONAL PARAMETER]
+            selectedItemStyle: const TextStyle(
+              color: Colors.black,
+              fontSize: 14,
+            ),
+
+            ///DropdownDialog Heading style [OPTIONAL PARAMETER]
+            dropdownHeadingStyle: const TextStyle(
+                color: Colors.black, fontSize: 17, fontWeight: FontWeight.bold),
+
+            ///DropdownDialog Item style [OPTIONAL PARAMETER]
+            dropdownItemStyle: const TextStyle(
+              color: Colors.black,
+              fontSize: 14,
+            ),
+
+            ///Dialog box radius [OPTIONAL PARAMETER]
+            dropdownDialogRadius: 10.0,
+
+            ///Search bar radius [OPTIONAL PARAMETER]
+            searchBarRadius: 10.0,
+
+            ///triggers once country selected in dropdown
+            onCountryChanged: (value) {
+              setState(() {
+                ///store value in country variable
+                countryValue = value;
+              });
+            },
+
+            ///triggers once state selected in dropdown
+            onStateChanged: (value) {
+              setState(() {
+                ///store value in state variable
+                stateValue = value;
+              });
+            },
+
+            ///triggers once city selected in dropdown
+            onCityChanged: (value) {
+              setState(() {
+                ///store value in city variable
+                cityValue = value;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   ///  =======================  PROPERTY TYPE  ======================
   propertyType() {
     return Column(
@@ -234,8 +363,9 @@ class _UploadState extends State<Upload> {
             animationDuration: 500,
             labels: [...types.keys],
             onToggle: (index) {
-              setState(() {});
-              currentIndex = index;
+              setState(() {
+                currentIndex = index;
+              });
             },
           ),
         ),
@@ -447,6 +577,30 @@ class _UploadState extends State<Upload> {
     );
   }
 
+  ///  =======================  BEDROOMS ======================
+  bedrooms() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        customText('Bedrooms'),
+        Slider(
+          value: currentBed,
+          min: minBed,
+          max: maxBed,
+          divisions: bedDivision,
+          // label: unitArea(currentBed.round().toString(), _selectedAreaUnit),
+          label: currentBed > 10 ? '10+' : currentBed.round().toString(),
+          onChanged: (value) {
+            setState(() {
+              currentBed = value.roundToDouble();
+            });
+          },
+          activeColor: Colors.black,
+        ),
+      ],
+    );
+  }
+
   ///  =================  WIDGETS  ===========================
   customText(String text) {
     return Padding(
@@ -531,6 +685,30 @@ class _UploadState extends State<Upload> {
           return '$value Kanal';
       }
     }
+  }
+
+  bathrooms() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        customText('Bathrooms'),
+        Slider(
+          value: currentBath,
+          min: minBath,
+          max: maxBath,
+          divisions: bathDivision,
+          // label: unitArea(currentBed.round().toString(), _selectedAreaUnit),
+          label: currentBath > 10 ? '10+' : currentBath.round().toString(),
+          onChanged: (value) {
+            setState(() {
+              currentBath = value.roundToDouble();
+            });
+          },
+          activeColor: Colors.black,
+        ),
+        const Divider(thickness: 2.0),
+      ],
+    );
   }
 }
 
