@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/core/routes.dart';
-import 'package:peak_property/drawer/custom_drawer.dart';
 import 'package:peak_property/presentation/alerts/alerts.dart';
 import 'package:peak_property/presentation/chat/chats_page.dart';
 
 import 'bookmark/bookmark.dart';
-import 'home/fixed/fixed.dart';
+import 'drawer/custom_drawer.dart';
 import 'home/home.dart';
+import 'search/search.dart';
 
 class AppNavigation extends StatefulWidget {
   const AppNavigation({Key? key}) : super(key: key);
@@ -88,10 +88,25 @@ class _AppNavigationState extends State<AppNavigation>
           navList[_bottomNavIndex],
           style: const TextStyle(color: Colors.black),
         ),
-        leading: const Icon(
-          FontAwesomeIcons.search,
-          size: MyApp.kDefaultIconSize - 5,
-          color: Colors.black,
+        leading: IconButton(
+          onPressed: () {
+            showModalBottomSheet(
+                context: context,
+                enableDrag: true,
+                elevation: 1.1,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(30.0))),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                backgroundColor: Colors.white,
+                builder: (context) => const Search());
+          },
+          icon: const Icon(
+            FontAwesomeIcons.search,
+            size: MyApp.kDefaultIconSize - 5,
+            color: Colors.black,
+          ),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
         backgroundColor: MyApp.kDefaultBackgroundColorWhite,

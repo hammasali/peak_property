@@ -1,18 +1,17 @@
-import 'package:animation_wrappers/animation_wrappers.dart';
-import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/custom/custom_button.dart';
+import 'package:peak_property/presentation/upload/upload.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
-class Upload extends StatefulWidget {
-  const Upload({Key? key}) : super(key: key);
+class Search extends StatefulWidget {
+  const Search({Key? key}) : super(key: key);
 
   @override
-  State<Upload> createState() => _UploadState();
+  State<Search> createState() => _SearchState();
 }
 
-class _UploadState extends State<Upload> {
+class _SearchState extends State<Search> {
   String _selectedAreaUnit = 'Marla';
 
   var currentIndex = 0;
@@ -71,14 +70,16 @@ class _UploadState extends State<Upload> {
       'Building',
     ]
   };
+
   final List<String> _areaUnit = [
     'Square Feet (sq.ft.)',
     'Square Meters (sq.m.)',
     'Square Yards (sq.yd.)',
     'Marla',
     'Kanal'
-  ]; // Option 2
+  ];
 
+  // Option 2
   @override
   void initState() {
     super.initState();
@@ -97,37 +98,43 @@ class _UploadState extends State<Upload> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final myAppBar = AppBar(
-      centerTitle: true,
-      title: Text(
-        MyApp.kAppTitle,
-        style: theme.textTheme.headline6,
-      ),
-      leading: IconButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        icon: const Icon(
-          Icons.cancel_outlined,
-          size: MyApp.kDefaultPadding * 2,
-        ),
-      ),
-      elevation: 0,
-    );
-
-    return Scaffold(
-      appBar: myAppBar,
-      backgroundColor: MyApp.kDefaultBackgroundColorWhite,
-      body: SingleChildScrollView(
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.9,
+      child: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            propertyPhoto(),
-            const Divider(thickness: 2.0),
-            location(),
-            const Divider(thickness: 2.0),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.01,
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.03,
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(
+                    Icons.cancel_outlined,
+                    size: MyApp.kDefaultPadding * 2,
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.27,
+                ),
+                const Text(
+                  "Filter",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Color(0xFF070821),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(),
             propertyType(),
             const Divider(thickness: 2.0),
             priceRange(),
@@ -137,13 +144,13 @@ class _UploadState extends State<Upload> {
             currentIndex == 0 ? bedrooms() : Container(),
             currentIndex == 0 ? const Divider(thickness: 2.0) : Container(),
             currentIndex == 0 ? bathrooms() : Container(),
-            const Padding(
-              padding: EdgeInsets.all(MyApp.kDefaultPadding),
+            Padding(
+              padding: const EdgeInsets.all(MyApp.kDefaultPadding),
               child: CustomButton(
-                label: 'Upload',
-                width: double.infinity,
-                icon: Icon(
-                  Icons.cloud_upload,
+                label: 'Search',
+                width: MediaQuery.of(context).size.width * 0.4,
+                icon: const Icon(
+                  Icons.search_sharp,
                   color: Colors.white,
                 ),
                 textColor: Colors.white,
@@ -152,198 +159,6 @@ class _UploadState extends State<Upload> {
           ],
         ),
       ),
-    );
-  }
-
-  ///  =======================  PROPERTY PHOTO  ======================
-  propertyPhoto() {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      customText("Property Photo"),
-      GridView.builder(
-          padding: const EdgeInsets.only(
-              left: MyApp.kDefaultPadding, right: MyApp.kDefaultPadding),
-          physics: const BouncingScrollPhysics(),
-          shrinkWrap: true,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            mainAxisSpacing: 5,
-            crossAxisSpacing: 5,
-            childAspectRatio: 1 / 1.57,
-          ),
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return Stack(
-                children: [
-                  SizedBox(
-                    height: 150,
-                    width: 100,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
-                      clipBehavior: Clip.hardEdge,
-                      child: Image.asset(
-                        'assets/dummy/img_3.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    child: Icon(
-                      Icons.cancel,
-                      color: Colors.red,
-                    ),
-                    right: 0.0,
-                    top: 0.0,
-                  ),
-                ],
-              );
-            }
-            if (index == 1) {
-              return Stack(
-                children: [
-                  SizedBox(
-                    height: 150,
-                    width: 100,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
-                      clipBehavior: Clip.hardEdge,
-                      child: Image.asset(
-                        'assets/dummy/img_4.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    child: Icon(
-                      Icons.cancel,
-                      color: Colors.red,
-                    ),
-                    right: 0.0,
-                    top: 0.0,
-                  ),
-                ],
-              );
-            }
-            return Stack(
-              children: [
-                Container(
-                  height: 150,
-                  width: 100,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
-                      border:
-                          Border.all(color: Theme.of(context).primaryColor)),
-                  child: const Icon(
-                    Icons.add_business,
-                    color: Colors.grey,
-                  ),
-                ),
-                const Positioned(
-                  child: Icon(
-                    Icons.cancel,
-                    color: Colors.transparent,
-                  ),
-                  right: 0.0,
-                  top: 0.0,
-                ),
-              ],
-            );
-          }),
-    ]);
-  }
-
-  ///  =======================  LOCATION ======================
-  location() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        customText('Location'),
-        Padding(
-          padding: const EdgeInsets.only(
-              left: MyApp.kDefaultPadding,
-              right: MyApp.kDefaultPadding,
-              bottom: MyApp.kDefaultPadding),
-          child: CSCPicker(
-            showStates: true,
-            showCities: true,
-            flagState: CountryFlag.ENABLE,
-
-            ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
-            dropdownDecoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade300, width: 1)),
-
-            ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
-            disabledDropdownDecoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                color: Colors.grey.shade300,
-                border: Border.all(color: Colors.grey.shade300, width: 1)),
-
-            ///placeholders for dropdown search field
-            countrySearchPlaceholder: "Country",
-            stateSearchPlaceholder: "State",
-            citySearchPlaceholder: "City",
-
-            ///labels for dropdown
-            countryDropdownLabel: "*Country",
-            stateDropdownLabel: "*State",
-            cityDropdownLabel: "*City",
-
-            ///Default Country
-            defaultCountry: DefaultCountry.Pakistan,
-
-            ///Disable country dropdown (Note: use it with default country)
-            disableCountry: true,
-
-            ///selected item style [OPTIONAL PARAMETER]
-            selectedItemStyle: const TextStyle(
-              color: Colors.black,
-              fontSize: 14,
-            ),
-
-            ///DropdownDialog Heading style [OPTIONAL PARAMETER]
-            dropdownHeadingStyle: const TextStyle(
-                color: Colors.black, fontSize: 17, fontWeight: FontWeight.bold),
-
-            ///DropdownDialog Item style [OPTIONAL PARAMETER]
-            dropdownItemStyle: const TextStyle(
-              color: Colors.black,
-              fontSize: 14,
-            ),
-
-            ///Dialog box radius [OPTIONAL PARAMETER]
-            dropdownDialogRadius: 10.0,
-
-            ///Search bar radius [OPTIONAL PARAMETER]
-            searchBarRadius: 10.0,
-
-            ///triggers once country selected in dropdown
-            onCountryChanged: (value) {
-              setState(() {
-                ///store value in country variable
-                countryValue = value;
-              });
-            },
-
-            ///triggers once state selected in dropdown
-            onStateChanged: (value) {
-              setState(() {
-                ///store value in state variable
-                stateValue = value;
-              });
-            },
-
-            ///triggers once city selected in dropdown
-            onCityChanged: (value) {
-              setState(() {
-                ///store value in city variable
-                cityValue = value;
-              });
-            },
-          ),
-        ),
-      ],
     );
   }
 
@@ -712,117 +527,4 @@ class _UploadState extends State<Upload> {
       }
     }
   }
-
 }
-
-class CustomChip extends StatefulWidget {
-  final List<String> title;
-
-  const CustomChip({Key? key, required this.title}) : super(key: key);
-
-  @override
-  _CustomChipState createState() => _CustomChipState();
-}
-
-class _CustomChipState extends State<CustomChip> {
-  int? defaultChoiceIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    defaultChoiceIndex = 0;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadedSlideAnimation(
-      child: Padding(
-        padding: const EdgeInsets.all(MyApp.kDefaultPadding),
-        child: Wrap(
-          spacing: 8.0, // gap between adjacent chips
-          runSpacing: 4.0,
-          children: List.generate(widget.title.length, (index) {
-            return ChoiceChip(
-              labelPadding: const EdgeInsets.all(2.0),
-              labelStyle: Theme.of(context)
-                  .textTheme
-                  .bodyText2!
-                  .copyWith(color: const Color(0xff807d7d), fontSize: 14),
-              label: Text(widget.title[index]),
-              selected: defaultChoiceIndex == index,
-              selectedColor: Colors.black87,
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(color: Colors.black, width: 1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              onSelected: (value) {
-                setState(() {
-                  defaultChoiceIndex = value ? index : defaultChoiceIndex;
-                });
-              },
-              // backgroundColor: color,
-              elevation: 1,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: MyApp.kDefaultPadding),
-            );
-          }),
-        ),
-      ),
-      beginOffset: const Offset(0, 0.3),
-      endOffset: const Offset(0, 0),
-      slideCurve: Curves.linearToEaseOut,
-    );
-  }
-}
-
-// Padding(
-//   padding: const EdgeInsets.all(MyApp.kDefaultPadding),
-//   child: Wrap(
-//     spacing: 8.0, // gap between adjacent chips
-//     runSpacing: 4.0,
-//     children: [...generateTags(currentIndex)],
-//   ),
-// ),
-
-// switch (key) {
-//   case 0:
-//     return types.values.first.map((e) => customChip(e)).toList();
-//   case 2:
-//     return types.values.last.map((e) => customChip(e)).toList();
-//   default:
-//     return types.values.elementAt(1).map((e) => customChip(e)).toList();
-// }
-
-// customChip(String title) {
-//   bool isActive = false;
-//
-//   return FadedSlideAnimation(
-//     child: ChoiceChip(
-//       selected: isActive,
-//       selectedColor: Colors.grey[300],
-//       disabledColor: Colors.transparent,
-//       label: Text(title,
-//           style: TextStyle(
-//             color: isActive ? Colors.black : Colors.grey,
-//           )),
-//       backgroundColor: Colors.grey[300],
-//       visualDensity: VisualDensity.adaptivePlatformDensity,
-//       shape: RoundedRectangleBorder(
-//         side: BorderSide(
-//             color: isActive ? Colors.black : Colors.transparent,
-//             width: isActive ? 1 : 0),
-//         borderRadius: BorderRadius.circular(10),
-//       ),
-//       onSelected: (bool value) {
-//         setState(() {
-//           isActive = value;
-//         });
-//       },
-//     ),
-//     beginOffset: const Offset(0, 0.3),
-//     endOffset: const Offset(0, 0),
-//     slideCurve: Curves.linearToEaseOut,
-//   );
-// }

@@ -1,6 +1,7 @@
 import 'package:animation_wrappers/animation_wrappers.dart';
 import 'package:flutter/material.dart';
 import 'package:peak_property/core/my_app.dart';
+import 'package:peak_property/presentation/home/bid/bid.dart';
 import 'package:peak_property/presentation/home/fixed/fixed.dart';
 
 class Home extends StatefulWidget {
@@ -30,7 +31,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             controller: _tabController,
             children:  const [
               Fixed(),
-              Center(child: Text("BID")),
+              Bid(),
             ],
           ),
 
