@@ -39,7 +39,6 @@ class _AppNavigationState extends State<AppNavigation>
 
   static final List<Widget> _children = <Widget>[
     const Home(),
-    // Bookmark(),
     const Bookmark(),
     const Notifications(),
     const ChatsPage(),

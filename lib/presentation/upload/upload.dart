@@ -1,4 +1,5 @@
 import 'package:animation_wrappers/animation_wrappers.dart';
+import 'package:chips_choice_null_safety/chips_choice_null_safety.dart';
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:peak_property/core/my_app.dart';
@@ -15,7 +16,18 @@ class Upload extends StatefulWidget {
 class _UploadState extends State<Upload> {
   String _selectedAreaUnit = 'Marla';
 
+  int _groupValue = 0;
+
   var currentIndex = 0;
+
+  int bedTag = 5;
+  int bathTag = 1;
+
+
+  double currentTime = 3;
+  double minTime = 1;
+  double maxTime = 9;
+  int timeDivision = 8;
 
   double currentBed = 3;
   double minBed = 1;
@@ -79,6 +91,20 @@ class _UploadState extends State<Upload> {
     'Kanal'
   ]; // Option 2
 
+  final List<String> options = [
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    '10+',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -128,9 +154,11 @@ class _UploadState extends State<Upload> {
             const Divider(thickness: 2.0),
             location(),
             const Divider(thickness: 2.0),
+            preference(),
+            const Divider(thickness: 2.0),
             propertyType(),
             const Divider(thickness: 2.0),
-            priceRange(),
+            _groupValue == 0 ? priceRange() : timeframe(),
             const Divider(thickness: 2.0),
             propertyArea(),
             const Divider(thickness: 2.0),
@@ -347,6 +375,31 @@ class _UploadState extends State<Upload> {
     );
   }
 
+  /// =============  PREFERENCE ================
+  preference() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        customText('Preference'),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _myRadioButton(
+              title: "Fixed Price",
+              value: 0,
+              onChanged: (newValue) => setState(() => _groupValue = newValue),
+            ),
+            _myRadioButton(
+              title: "Bid Price",
+              value: 1,
+              onChanged: (newValue) => setState(() => _groupValue = newValue),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   ///  =======================  PROPERTY TYPE  ======================
   propertyType() {
     return Column(
@@ -477,6 +530,34 @@ class _UploadState extends State<Upload> {
     );
   }
 
+  ///  =======================  TIME FRAME ======================
+  timeframe() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            customText('Time Frame'),
+            Text('(${timeframeRange(currentTime.round())})')
+          ],
+        ),
+        Slider(
+          value: currentTime,
+          min: minTime,
+          max: maxTime,
+          divisions: timeDivision,
+          label: timeframeRange(currentTime.round()),
+          onChanged: (value) {
+            setState(() {
+              currentTime = value.roundToDouble();
+            });
+          },
+          activeColor: Colors.black,
+        ),
+      ],
+    );
+  }
+
   ///  =======================  PROPERTY AREA  ======================
   propertyArea() {
     return Column(
@@ -583,44 +664,80 @@ class _UploadState extends State<Upload> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         customText('Bedrooms'),
-        Slider(
-          value: currentBed,
-          min: minBed,
-          max: maxBed,
-          divisions: bedDivision,
-          // label: unitArea(currentBed.round().toString(), _selectedAreaUnit),
-          label: currentBed > 10 ? '10+' : currentBed.round().toString(),
-          onChanged: (value) {
-            setState(() {
-              currentBed = value.roundToDouble();
-            });
-          },
-          activeColor: Colors.black,
+        // Slider(
+        //   value: currentBed,
+        //   min: minBed,
+        //   max: maxBed,
+        //   divisions: bedDivision,
+        //   label: currentBed > 10 ? '10+' : currentBed.round().toString(),
+        //   onChanged: (value) {
+        //     setState(() {
+        //       currentBed = value.roundToDouble();
+        //     });
+        //   },
+        //   activeColor: Colors.black,
+        // ),
+        Center(
+          child: ChipsChoice<int>.single(
+            wrapped: true,
+            spacing: 50.0,
+            runSpacing: 15.0,
+            value: bedTag,
+            onChanged: (val) => setState(() => bedTag = val),
+            choiceItems: C2Choice.listFrom<int, String>(
+              source: options,
+              value: (i, v) => i,
+              label: (i, v) => v,
+            ),
+            choiceStyle: const C2ChoiceStyle(
+              padding: EdgeInsets.all(12.0),
+              borderShape: CircleBorder(),
+              color: MyApp.kDefaultButtonColorBlack,
+            ),
+          ),
         ),
       ],
     );
   }
 
   ///  =======================  BATHROOMS ======================
-
   bathrooms() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         customText('Bathrooms'),
-        Slider(
-          value: currentBath,
-          min: minBath,
-          max: maxBath,
-          divisions: bathDivision,
-          // label: unitArea(currentBed.round().toString(), _selectedAreaUnit),
-          label: currentBath > 10 ? '10+' : currentBath.round().toString(),
-          onChanged: (value) {
-            setState(() {
-              currentBath = value.roundToDouble();
-            });
-          },
-          activeColor: Colors.black,
+        // Slider(
+        //   value: currentBath,
+        //   min: minBath,
+        //   max: maxBath,
+        //   divisions: bathDivision,
+        //   // label: unitArea(currentBed.round().toString(), _selectedAreaUnit),
+        //   label: currentBath > 10 ? '10+' : currentBath.round().toString(),
+        //   onChanged: (value) {
+        //     setState(() {
+        //       currentBath = value.roundToDouble();
+        //     });
+        //   },
+        //   activeColor: Colors.black,
+        // ),
+        Center(
+          child: ChipsChoice<int>.single(
+            wrapped: true,
+            spacing: 50.0,
+            runSpacing: 15.0,
+            value: bathTag,
+            onChanged: (val) => setState(() => bathTag = val),
+            choiceItems: C2Choice.listFrom<int, String>(
+              source: options,
+              value: (i, v) => i,
+              label: (i, v) => v,
+            ),
+            choiceStyle: const C2ChoiceStyle(
+              padding: EdgeInsets.all(12.0),
+              borderShape: CircleBorder(),
+              color: MyApp.kDefaultButtonColorBlack,
+            ),
+          ),
         ),
         const Divider(thickness: 2.0),
       ],
@@ -713,6 +830,46 @@ class _UploadState extends State<Upload> {
     }
   }
 
+  Widget _myRadioButton({String? title, int? value, onChanged}) {
+    return RadioListTile(
+      activeColor: MyApp.kDefaultButtonColorBlack,
+      value: value,
+      groupValue: _groupValue,
+      onChanged: onChanged,
+      title: Text(
+        title!,
+        style: Theme.of(context).textTheme.bodyText1,
+      ),
+      subtitle: Text(value == 0
+          ? 'Where you can set price range of your property and negotiate with dealer'
+          : 'Here you can specify the amount of time and dealer will bid within time frame'),
+      dense: true,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+    );
+  }
+
+  timeframeRange(int value) {
+    switch (value) {
+      case 1:
+        return '6 hr';
+      case 2:
+        return '12 hr';
+      case 3:
+        return '1 day';
+      case 4:
+        return '2 days';
+      case 5:
+        return '3 days';
+      case 6:
+        return '4 days';
+      case 7:
+        return '5 days';
+      case 8:
+        return '6 days';
+      case 9:
+        return '1 week';
+    }
+  }
 }
 
 class CustomChip extends StatefulWidget {
@@ -752,7 +909,6 @@ class _CustomChipState extends State<CustomChip> {
               selected: defaultChoiceIndex == index,
               selectedColor: Colors.black87,
               visualDensity: VisualDensity.adaptivePlatformDensity,
-
               shape: RoundedRectangleBorder(
                 side: const BorderSide(color: Colors.black, width: 1),
                 borderRadius: BorderRadius.circular(10),

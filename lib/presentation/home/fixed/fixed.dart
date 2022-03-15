@@ -63,5 +63,4 @@ class Fixed extends StatelessWidget {
       },
     ),
   );
-
 }
