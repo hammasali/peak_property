@@ -7,8 +7,7 @@ import 'package:peak_property/custom/custom_feeds.dart';
 import 'package:peak_property/custom/custom_fixed.dart';
 import 'package:peak_property/dummy.dart';
 
-//TODO: INTERCHANGE BID SYSTEM INTO FIXED SYSTEM i.e.
-//TODO: change files name or copy the code from bid to fix and fix to bid
+
 //TODO: CREATE BID DETAIL SCREEN
 
 class Bid extends StatelessWidget {

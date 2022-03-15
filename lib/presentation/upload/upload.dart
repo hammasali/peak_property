@@ -23,7 +23,6 @@ class _UploadState extends State<Upload> {
   int bedTag = 5;
   int bathTag = 1;
 
-
   double currentTime = 3;
   double minTime = 1;
   double maxTime = 9;
@@ -56,6 +55,10 @@ class _UploadState extends State<Upload> {
   TextEditingController startController = TextEditingController();
   TextEditingController endController = TextEditingController();
   TextEditingController areaController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController tittleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
 
   final types = {
     'Homes': [
@@ -118,6 +121,9 @@ class _UploadState extends State<Upload> {
     startController.dispose();
     endController.dispose();
     areaController.dispose();
+    addressController.dispose();
+    tittleController.dispose();
+    descriptionController.dispose();
     super.dispose();
   }
 
@@ -136,48 +142,53 @@ class _UploadState extends State<Upload> {
           Navigator.of(context).pop();
         },
         icon: const Icon(
-          Icons.cancel_outlined,
+          Icons.arrow_back_ios_outlined,
           size: MyApp.kDefaultPadding * 2,
         ),
       ),
       elevation: 0,
     );
 
-    return Scaffold(
-      appBar: myAppBar,
-      backgroundColor: MyApp.kDefaultBackgroundColorWhite,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            propertyPhoto(),
-            const Divider(thickness: 2.0),
-            location(),
-            const Divider(thickness: 2.0),
-            preference(),
-            const Divider(thickness: 2.0),
-            propertyType(),
-            const Divider(thickness: 2.0),
-            _groupValue == 0 ? priceRange() : timeframe(),
-            const Divider(thickness: 2.0),
-            propertyArea(),
-            const Divider(thickness: 2.0),
-            currentIndex == 0 ? bedrooms() : Container(),
-            currentIndex == 0 ? const Divider(thickness: 2.0) : Container(),
-            currentIndex == 0 ? bathrooms() : Container(),
-            const Padding(
-              padding: EdgeInsets.all(MyApp.kDefaultPadding),
-              child: CustomButton(
-                label: 'Upload',
-                width: double.infinity,
-                icon: Icon(
-                  Icons.cloud_upload,
-                  color: Colors.white,
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        appBar: myAppBar,
+        backgroundColor: MyApp.kDefaultBackgroundColorWhite,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              propertyPhoto(),
+              const Divider(thickness: 2.0),
+              location(),
+              const Divider(thickness: 2.0),
+              preference(),
+              const Divider(thickness: 2.0),
+              information(),
+              const Divider(thickness: 2.0),
+              propertyType(),
+              const Divider(thickness: 2.0),
+              _groupValue == 0 ? priceRange() : timeframe(),
+              const Divider(thickness: 2.0),
+              propertyArea(),
+              const Divider(thickness: 2.0),
+              currentIndex == 0 ? bedrooms() : Container(),
+              currentIndex == 0 ? const Divider(thickness: 2.0) : Container(),
+              currentIndex == 0 ? bathrooms() : Container(),
+              const Padding(
+                padding: EdgeInsets.all(MyApp.kDefaultPadding),
+                child: CustomButton(
+                  label: 'Upload',
+                  width: double.infinity,
+                  icon: Icon(
+                    Icons.cloud_upload,
+                    color: Colors.white,
+                  ),
+                  textColor: Colors.white,
                 ),
-                textColor: Colors.white,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -371,6 +382,33 @@ class _UploadState extends State<Upload> {
             },
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.only(
+            left: MyApp.kDefaultPadding,
+            right: MyApp.kDefaultPadding,
+          ),
+          child: TextFormField(
+            controller: addressController,
+            cursorHeight: 25.0,
+            maxLength: 100,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            cursorColor: Colors.black,
+            decoration: const InputDecoration(
+              label: Text('* Address'),
+              fillColor: Colors.black,
+              isDense: true,
+              hintStyle: TextStyle(color: Colors.grey),
+              focusColor: Colors.black,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+            ),
+          ),
+        )
       ],
     );
   }
@@ -396,6 +434,70 @@ class _UploadState extends State<Upload> {
             ),
           ],
         ),
+      ],
+    );
+  }
+
+  /// =============  INFORMATION ================
+  information() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        customText('Info'),
+        Padding(
+          padding: const EdgeInsets.only(
+            left: MyApp.kDefaultPadding,
+            right: MyApp.kDefaultPadding,
+          ),
+          child: TextFormField(
+            controller: tittleController,
+            cursorHeight: 25.0,
+            maxLength: 100,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            cursorColor: Colors.black,
+            decoration: const InputDecoration(
+              label: Text('* Title'),
+              fillColor: Colors.black,
+              isDense: true,
+              hintStyle: TextStyle(color: Colors.grey),
+              focusColor: Colors.black,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+            left: MyApp.kDefaultPadding,
+            right: MyApp.kDefaultPadding,
+          ),
+          child: TextFormField(
+            controller: descriptionController,
+            cursorHeight: 25.0,
+            maxLength: 200,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            cursorColor: Colors.black,
+            decoration: const InputDecoration(
+              label: Text('* Description'),
+              fillColor: Colors.black,
+              isDense: true,
+              hintStyle: TextStyle(color: Colors.grey),
+              focusColor: Colors.black,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+            ),
+          ),
+        )
       ],
     );
   }
@@ -830,7 +932,7 @@ class _UploadState extends State<Upload> {
     }
   }
 
-  Widget _myRadioButton({String? title, int? value, onChanged}) {
+  _myRadioButton({String? title, int? value, onChanged}) {
     return RadioListTile(
       activeColor: MyApp.kDefaultButtonColorBlack,
       value: value,
@@ -870,6 +972,7 @@ class _UploadState extends State<Upload> {
         return '1 week';
     }
   }
+
 }
 
 class CustomChip extends StatefulWidget {
@@ -896,7 +999,7 @@ class _CustomChipState extends State<CustomChip> {
       child: Padding(
         padding: const EdgeInsets.all(MyApp.kDefaultPadding),
         child: Wrap(
-          spacing: 8.0, // gap between adjacent chips
+          spacing: 8.0,
           runSpacing: 4.0,
           children: List.generate(widget.title.length, (index) {
             return ChoiceChip(

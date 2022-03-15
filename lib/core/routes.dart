@@ -7,6 +7,7 @@ import 'package:peak_property/presentation/app_navigation.dart';
 import 'package:peak_property/presentation/chat/chat_screen.dart';
 import 'package:peak_property/presentation/drawer/edit_profile/edit_profile.dart';
 import 'package:peak_property/presentation/drawer/profile/profile.dart';
+import 'package:peak_property/presentation/home/bid/bid_detail.dart';
 import 'package:peak_property/presentation/home/fixed/fixed_detail.dart';
 import 'package:peak_property/presentation/upload/upload.dart';
 
@@ -18,6 +19,7 @@ class Routes {
   static const String signIn = 'login/signIn';
   static const String appNavigation = 'appNavigation';
   static const String fixedDetails = '/fixedDetails';
+  static const String bidDetails = '/bidDetails';
   static const String conversationScreen = '/conversationScreen';
   static const String profile = '/profile';
   static const String editProfile = '/editProfile';
@@ -63,6 +65,10 @@ class RouteNavigator extends StatelessWidget {
               builder = (BuildContext _) => FixedDetailScreen(
                     hero: settings.arguments as String,
                   );
+              break;
+
+            case Routes.bidDetails:
+              builder = (BuildContext _) => const BidDetails();
               break;
 
             case Routes.conversationScreen:
