@@ -45,6 +45,11 @@ dependencies:
   path_provider: ^2.0.8
   csc_picker: ^0.2.6
   chips_choice_null_safety: ^2.0.6
+  flutter_timer_countdown: ^1.0.3
+  intl: ^0.17.0
+  carousel_slider: ^4.0.0
+
+
 
 
 dev_dependencies:

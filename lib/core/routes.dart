@@ -8,6 +8,7 @@ import 'package:peak_property/presentation/chat/chat_screen.dart';
 import 'package:peak_property/presentation/drawer/edit_profile/edit_profile.dart';
 import 'package:peak_property/presentation/drawer/profile/profile.dart';
 import 'package:peak_property/presentation/home/bid/bid_detail.dart';
+import 'package:peak_property/presentation/home/bid/place_bid.dart';
 import 'package:peak_property/presentation/home/fixed/fixed_detail.dart';
 import 'package:peak_property/presentation/upload/upload.dart';
 
@@ -24,6 +25,7 @@ class Routes {
   static const String profile = '/profile';
   static const String editProfile = '/editProfile';
   static const String upload = '/upload';
+  static const String placeBid = '/placeBid';
 }
 
 class RouteNavigator extends StatelessWidget {
@@ -62,29 +64,32 @@ class RouteNavigator extends StatelessWidget {
               break;
 
             case Routes.fixedDetails:
-              builder = (BuildContext _) => FixedDetailScreen(
-                    hero: settings.arguments as String,
-                  );
+              builder = (BuildContext _) =>
+                  FixedDetailScreen(hero: settings.arguments as String);
               break;
 
             case Routes.bidDetails:
               builder = (BuildContext _) => const BidDetails();
               break;
 
+            case Routes.placeBid:
+              builder = (BuildContext _) =>  PlaceBidScreen();
+              break;
+
             case Routes.conversationScreen:
-              builder = (BuildContext _) =>  ChatSingleScreen();
+              builder = (BuildContext _) => ChatSingleScreen();
               break;
 
             case Routes.profile:
-              builder = (BuildContext _) =>  const Profile();
+              builder = (BuildContext _) => const Profile();
               break;
 
             case Routes.editProfile:
-              builder = (BuildContext _) =>  const EditProfile();
+              builder = (BuildContext _) => const EditProfile();
               break;
 
             case Routes.upload:
-              builder = (BuildContext _) =>  const Upload();
+              builder = (BuildContext _) => const Upload();
               break;
           }
           return MaterialPageRoute(builder: builder, settings: settings);

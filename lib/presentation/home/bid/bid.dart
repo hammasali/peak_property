@@ -1,12 +1,8 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:peak_property/core/my_app.dart';
+
 import 'package:peak_property/core/routes.dart';
 import 'package:peak_property/custom/custom_feeds.dart';
-import 'package:peak_property/custom/custom_fixed.dart';
 import 'package:peak_property/dummy.dart';
-
 
 //TODO: CREATE BID DETAIL SCREEN
 
@@ -32,7 +28,7 @@ class Bid extends StatelessWidget {
           hero: _data.image[index],
           onTap: () {
             Navigator.of(context)
-                .pushNamed(Routes.fixedDetails, arguments: _data.image);
+                .pushNamed(Routes.bidDetails);
           },
         );
       },
