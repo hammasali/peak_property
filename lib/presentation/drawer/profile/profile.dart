@@ -162,7 +162,7 @@ class _ProfileState extends State<Profile> {
                         description: _data.description,
                         time: _data.time,
                         image: _data.image,
-                        hero: _data.image[index],
+                        hero: _data.image[index], bookmark: false,
                       ),
                     );
                   })

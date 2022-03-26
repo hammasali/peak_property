@@ -26,7 +26,7 @@ class Bookmark extends StatelessWidget {
           onTap: () {
             Navigator.of(context)
                 .pushNamed(Routes.fixedDetails, arguments: _data.image);
-          },
+          }, bookmark: true,
         );
       },
       separatorBuilder: (context, index) => const Divider(),

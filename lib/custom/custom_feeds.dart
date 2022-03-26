@@ -1,10 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:peak_property/core/routes.dart';
 
 class CustomFeeds extends StatelessWidget {
   final String title, subtitle, description, time, image, hero;
   final onTap;
+  final bool bookmark;
 
   const CustomFeeds(
       {Key? key,
@@ -14,6 +14,7 @@ class CustomFeeds extends StatelessWidget {
       required this.time,
       required this.image,
       required this.hero,
+      required this.bookmark,
       this.onTap})
       : super(key: key);
 
@@ -86,12 +87,14 @@ class CustomFeeds extends StatelessWidget {
             ),
 
             ///   =========== TIME ===============
-            FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  time,
-                  style: const TextStyle(fontSize: 12.0),
-                ))
+            bookmark
+                ? IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark))
+                : FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      time,
+                      style: const TextStyle(fontSize: 12.0),
+                    ))
           ],
         ),
       ),

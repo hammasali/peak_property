@@ -27,9 +27,9 @@ class Bid extends StatelessWidget {
           image: _data.image,
           hero: _data.image[index],
           onTap: () {
-            Navigator.of(context)
-                .pushNamed(Routes.bidDetails);
+            Navigator.of(context).pushNamed(Routes.bidDetails);
           },
+          bookmark: false,
         );
       },
       separatorBuilder: (context, index) => const Divider(),
