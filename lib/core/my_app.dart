@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class MyApp {
   /// ==============  Strings  ================
@@ -44,7 +45,8 @@ class MyApp {
   static const String about = 'About';
 
   static const String confirm = 'Confirm';
-  static const String confirmationText = 'Are you sure you wish to delete this item?';
+  static const String confirmationText =
+      'Are you sure you wish to delete this item?';
   static const String cancel = 'Cancel';
   static const String delete = 'Delete';
 
@@ -85,6 +87,8 @@ class MyApp {
   static const Color kDefaultButtonColorBlack = Color(0xDD000000);
 
   static const Color kDefaultCheckColor = Color(0xff4caf50);
+}
 
-
+getCircularProgress() {
+  return const SpinKitFoldingCube(color: Colors.black54, size: 24.0);
 }

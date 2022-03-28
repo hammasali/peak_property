@@ -29,10 +29,14 @@ class Routes {
 }
 
 class RouteNavigator extends StatelessWidget {
-  const RouteNavigator({Key? key}) : super(key: key);
+  final String initialRoute;
+
+  const RouteNavigator({Key? key, required this.initialRoute})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
       onWillPop: () async {
         var canPop = navigatorKey.currentState!.canPop();
@@ -43,9 +47,10 @@ class RouteNavigator extends StatelessWidget {
       },
       child: Navigator(
         key: navigatorKey,
-        initialRoute: Routes.appNavigation,
+        initialRoute: initialRoute,
         onGenerateRoute: (RouteSettings settings) {
           late WidgetBuilder builder;
+
           switch (settings.name) {
             case Routes.loginRoot:
               builder = (BuildContext _) => const LoginScreen();
@@ -73,7 +78,7 @@ class RouteNavigator extends StatelessWidget {
               break;
 
             case Routes.placeBid:
-              builder = (BuildContext _) =>  PlaceBidScreen();
+              builder = (BuildContext _) => PlaceBidScreen();
               break;
 
             case Routes.conversationScreen:

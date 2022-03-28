@@ -1,18 +1,45 @@
 import 'package:animation_wrappers/animation_wrappers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:peak_property/business_logic/cubit/logout_cubit/logout_cubit.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/core/routes.dart';
 import 'package:peak_property/custom/custom_button.dart';
+import 'package:peak_property/presentation/drawer/logout/logout_screen.dart';
 
-class MyDrawer extends StatefulWidget {
+class MyDrawer extends StatelessWidget {
   const MyDrawer({Key? key}) : super(key: key);
 
   @override
-  State<MyDrawer> createState() => _MyDrawerState();
+  Widget build(BuildContext context) {
+    return BlocConsumer<LogoutCubit, LogoutState>(
+      listener: (context, state) {
+        if (state is LogoutSuccessState) {
+          Navigator.pushNamedAndRemoveUntil<dynamic>(
+            context,
+            Routes.loginRoot,
+            (route) => false, //if you want to disable back feature set to false
+          );
+        }
+      },
+      builder: (context, state) {
+        if (state is LogoutLoadingState) return const LogoutScreen();
+
+        return const DrawerScreen();
+      },
+    );
+  }
 }
 
-class _MyDrawerState extends State<MyDrawer> {
+class DrawerScreen extends StatefulWidget {
+  const DrawerScreen({Key? key}) : super(key: key);
+
+  @override
+  State<DrawerScreen> createState() => _DrawerScreenState();
+}
+
+class _DrawerScreenState extends State<DrawerScreen> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -79,7 +106,6 @@ class _MyDrawerState extends State<MyDrawer> {
                           function: () {
                             Navigator.of(context).pop();
                             Navigator.of(context).pushNamed(Routes.editProfile);
-
                           }),
                       tiles(
                           context: context,
@@ -92,6 +118,7 @@ class _MyDrawerState extends State<MyDrawer> {
                           title: MyApp.logout,
                           function: () {
                             Navigator.of(context).pop();
+                            BlocProvider.of<LogoutCubit>(context).logOut();
                           }),
                       tiles(
                           context: context,

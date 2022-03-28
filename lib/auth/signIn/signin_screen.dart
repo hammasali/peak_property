@@ -66,6 +66,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: MyApp.kDefaultFontSize * 2,
+                      color: MyApp.kDefaultTextColorBlack
                     ),
                   ),
                 ),
@@ -183,7 +184,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ),
 
-                // ================ Or Continue with facebook and google =======
+                // ================ Or Continue with google =======
                 Container(
                   margin: const EdgeInsets.only(top: MyApp.kDefaultPadding * 4),
                   width: double.infinity,
@@ -216,6 +217,8 @@ class _SignInScreenState extends State<SignInScreen> {
                               MyApp.registrationTxt,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
+                                  color: MyApp.kDefaultTextColorBlack
+
                               ),
                             ),
                           ),
