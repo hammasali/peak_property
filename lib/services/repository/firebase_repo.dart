@@ -8,9 +8,12 @@ class FirebaseRepo {
 
   final FirebaseMethod _firebaseMethod = FirebaseMethod();
 
+  /// =========== AUTH ================
+
   Future<bool> authSignIn() async => await _firebaseMethod.isSignedIn();
 
-  void resetPassword(String email) => _firebaseMethod.resetPassword(email);
+  Future<void> resetPassword(String email) async =>
+      await _firebaseMethod.resetPassword(email);
 
   Future<void> signOutUser() async => await _firebaseMethod.signOutUser();
 
@@ -21,6 +24,14 @@ class FirebaseRepo {
 
   Future<User?> createUser(String email, String password) async =>
       await _firebaseMethod.createUser(email, password);
+
+  Future<User?> signInUser(String email, String password) async =>
+      await _firebaseMethod.signInUser(email, password);
+
+  Future<bool> authenticateNewUser(String? email) async =>
+      await _firebaseMethod.authenticateNewUser(email);
+
+  /// =============== DATABASE ==============
 
   Future<void> addNewUserData(var model) async =>
       await _firebaseMethod.addNewUserData(model);

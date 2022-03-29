@@ -58,13 +58,36 @@ class RegistrationCubit extends Cubit<RegistrationState> {
   }
 
   void googleSignInEvent() async {
-    emit(RegistrationGoogleLoadingState());
+    try {
+      emit(RegistrationGoogleLoadingState());
+      var userCredential = await FirebaseRepo.instance.signInWithGoogle();
+      if (userCredential.user != null) {
+        String _createdAt =
+        DateFormat('EEE, MMM d, ' 'yyyy h:mm a').format(DateTime.now());
 
-    var userCredential = await FirebaseRepo.instance.signInWithGoogle();
+        User? current = FirebaseRepo.instance.getCurrentUser();
 
-    if (userCredential.user != null) {
-      emit(RegistrationSuccessfulState(user: userCredential.user));
+        var isNewer =
+        await FirebaseRepo.instance.authenticateNewUser(current!.email);
+
+        if (isNewer) {
+          UserInfoModel _userInfoModel = UserInfoModel(
+            name: current.displayName,
+            email: current.email,
+            createdAt: _createdAt,
+          );
+
+          await FirebaseRepo.instance
+              .addNewUserData(_userInfoModel.toMap());
+        }
+
+
+        emit(RegistrationSuccessfulState(user: userCredential.user));
+      }
+    }
+    //==================Errors=======================
+    on FirebaseAuthException catch (e) {
+      emit(RegistrationUnsuccessfulState(message: e.message));
     }
   }
-
 }

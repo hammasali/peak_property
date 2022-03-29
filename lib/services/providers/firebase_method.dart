@@ -7,19 +7,25 @@ class FirebaseMethod {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-
   ///  =========  Authentication State   ========== ///
 
   Future<bool> isSignedIn() async => _firebaseAuth.currentUser != null;
 
   User? getCurrentUser() => _firebaseAuth.currentUser;
 
-  void resetPassword(String email) =>
-      _firebaseAuth.sendPasswordResetEmail(email: email);
+  Future<void> resetPassword(String email) async =>
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
 
   Future<void> signOutUser() async {
     _googleSignIn.disconnect();
     await _firebaseAuth.signOut();
+  }
+
+  Future<bool> authenticateNewUser(String? email) async {
+    final result = await Future.value(
+        _firestore.collection('users').where('email', isEqualTo: email).get());
+
+    return result.docs.isEmpty ? true : false;
   }
 
   ///  =========  Registration   ========== ///
@@ -43,6 +49,11 @@ class FirebaseMethod {
     return result.user;
   }
 
+  Future<User?> signInUser(String email, String password) async {
+    var result = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email, password: password);
+    return result.user;
+  }
 
   ///  =========  Database   ========== ///
 

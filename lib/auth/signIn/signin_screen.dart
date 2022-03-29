@@ -1,6 +1,9 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:peak_property/business_logic/cubit/login_cubit/login_cubit.dart';
+import 'package:peak_property/business_logic/cubit/registration_cubit/registration_cubit.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/custom/custom_button.dart';
 import 'package:peak_property/core/routes.dart';
@@ -18,7 +21,6 @@ class _SignInScreenState extends State<SignInScreen> {
   late String _email, _password;
 
   bool _isValidEmail = false;
-  bool _isValidPassword = false;
   bool _isForgetPasswordPressed = false;
 
   @override
@@ -26,12 +28,6 @@ class _SignInScreenState extends State<SignInScreen> {
     _email = '';
     _password = '';
     super.initState();
-  }
-
-  bool validatePassword(String value) {
-    String pattern = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{6,}$';
-    RegExp regExp = RegExp(pattern);
-    return regExp.hasMatch(value);
   }
 
   String get _invalidPass => MyApp.invalidPassError;
@@ -64,10 +60,9 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: Text(
                     MyApp.signInTxt,
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: MyApp.kDefaultFontSize * 2,
-                      color: MyApp.kDefaultTextColorBlack
-                    ),
+                        fontWeight: FontWeight.bold,
+                        fontSize: MyApp.kDefaultFontSize * 2,
+                        color: MyApp.kDefaultTextColorBlack),
                   ),
                 ),
                 const SizedBox(height: MyApp.kDefaultPadding * 2),
@@ -113,28 +108,13 @@ class _SignInScreenState extends State<SignInScreen> {
                         Visibility(
                           visible: !_isForgetPasswordPressed,
                           child: TextFormField(
-                            onChanged: (value) {
-                              bool check = validatePassword(value);
-                              setState(() {
-                                _isValidPassword = check;
-                              });
-                            },
                             onSaved: (value) {
                               _password = value!;
                             },
                             validator: (value) =>
-                                (value!.trim().isEmpty || !_isValidPassword)
-                                    ? _invalidPass
-                                    : null,
+                                (value!.trim().isEmpty) ? _invalidPass : null,
                             obscureText: true,
-                            decoration: InputDecoration(
-                              suffixIcon: _isValidPassword
-                                  ? const Icon(
-                                      Icons.check_circle,
-                                      color: MyApp.kDefaultCheckColor,
-                                      size: MyApp.kDefaultIconSize - 10,
-                                    )
-                                  : null,
+                            decoration: const InputDecoration(
                               labelText: MyApp.passwordTxt,
                             ),
                           ),
@@ -165,26 +145,54 @@ class _SignInScreenState extends State<SignInScreen> {
                         const SizedBox(height: MyApp.kDefaultPadding * 2),
 
                         //======================SIGNIN BUTTON===================
-                        CustomButton(
-                          width: double.infinity,
-                          label: _isForgetPasswordPressed
-                              ? MyApp.verifyTxt
-                              : MyApp.signInTxt,
-                          padding: MyApp.kDefaultPadding / 1.5,
-                          onTap: () {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                  Routes.appNavigation, (route) => false);
-                            }
-                          },
-                        ),
+
+                        BlocConsumer<LoginCubit, LoginState>(
+                            bloc: BlocProvider.of<LoginCubit>(context),
+                            builder: (context, state) {
+                              if (state is LoginLoadingState) {
+                                return getCircularProgress();
+                              }
+
+                              return CustomButton(
+                                width: double.infinity,
+                                label: _isForgetPasswordPressed
+                                    ? MyApp.verifyTxt
+                                    : MyApp.signInTxt,
+                                padding: MyApp.kDefaultPadding / 1.5,
+                                onTap: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    _formKey.currentState!.save();
+
+                                    _isForgetPasswordPressed
+                                        ? BlocProvider.of<LoginCubit>(context)
+                                            .forgetPasswordButtonPressedEvent(
+                                                _email)
+                                        : BlocProvider.of<LoginCubit>(context)
+                                            .signInButtonPressedEvent(
+                                                _email,
+                                                _password);
+                                  }
+                                },
+                              );
+                            },
+                            listener: (context, state) {
+                              if (state is LoginSuccessState) {
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                    Routes.appNavigation, (route) => false);
+                              } else if (state is LoginUnSuccessState) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content:
+                                            Text(state.message.toString())));
+                              }
+                            }),
                       ],
                     ),
                   ),
                 ),
 
                 // ================ Or Continue with google =======
+
                 Container(
                   margin: const EdgeInsets.only(top: MyApp.kDefaultPadding * 4),
                   width: double.infinity,
@@ -193,16 +201,36 @@ class _SignInScreenState extends State<SignInScreen> {
                     children: [
                       const Text(MyApp.continueWithTxt),
                       const SizedBox(height: MyApp.kDefaultPadding),
-                      Center(
-                        child: IconButton(
-                          icon: const Icon(
-                            FontAwesomeIcons.google,
-                            size: (MyApp.kDefaultFontSize * 3) - 3,
-                            color: MyApp.kDefaultGoogleIconColor,
-                          ),
-                          onPressed: () => {},
-                        ),
-                      ),
+
+                      BlocConsumer<RegistrationCubit, RegistrationState>(
+                          bloc: BlocProvider.of<RegistrationCubit>(context),
+                          builder: (context, state) {
+                            if (state is RegistrationGoogleLoadingState) {
+                              return getCircularProgress();
+                            }
+                            return Center(
+                              child: IconButton(
+                                icon: const Icon(
+                                  FontAwesomeIcons.google,
+                                  size: (MyApp.kDefaultFontSize * 3) - 3,
+                                  color: MyApp.kDefaultGoogleIconColor,
+                                ),
+                                onPressed: () =>
+                                    BlocProvider.of<RegistrationCubit>(context)
+                                        .googleSignInEvent(),
+                              ),
+                            );
+                          },
+                          listener: (context, state) {
+                            if (state is RegistrationSuccessfulState) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  Routes.appNavigation, (route) => false);
+                            } else if (state is RegistrationUnsuccessfulState) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(state.message.toString())));
+                            }
+                          }),
                       const SizedBox(height: MyApp.kDefaultPadding * 5),
 
                       // ============ Don't Have Account =================
@@ -216,10 +244,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             child: const Text(
                               MyApp.registrationTxt,
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                  color: MyApp.kDefaultTextColorBlack
-
-                              ),
+                                  fontWeight: FontWeight.bold,
+                                  color: MyApp.kDefaultTextColorBlack),
                             ),
                           ),
                         ],
