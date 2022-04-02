@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:animation_wrappers/animation_wrappers.dart';
 import 'package:chips_choice_null_safety/chips_choice_null_safety.dart';
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:peak_property/business_logic/cubit/image_cubit/image_cubit.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/custom/custom_button.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -58,7 +63,6 @@ class _UploadState extends State<Upload> {
   TextEditingController addressController = TextEditingController();
   TextEditingController tittleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-
 
   final types = {
     'Homes': [
@@ -196,99 +200,44 @@ class _UploadState extends State<Upload> {
 
   ///  =======================  PROPERTY PHOTO  ======================
   propertyPhoto() {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      customText("Property Photo"),
-      GridView.builder(
-          padding: const EdgeInsets.only(
-              left: MyApp.kDefaultPadding, right: MyApp.kDefaultPadding),
-          physics: const BouncingScrollPhysics(),
-          shrinkWrap: true,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            mainAxisSpacing: 5,
-            crossAxisSpacing: 5,
-            childAspectRatio: 1 / 1.57,
-          ),
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return Stack(
-                children: [
-                  SizedBox(
-                    height: 150,
-                    width: 100,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
-                      clipBehavior: Clip.hardEdge,
-                      child: Image.asset(
-                        'assets/dummy/img_3.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    child: Icon(
-                      Icons.cancel,
-                      color: Colors.red,
-                    ),
-                    right: 0.0,
-                    top: 0.0,
-                  ),
-                ],
-              );
-            }
-            if (index == 1) {
-              return Stack(
-                children: [
-                  SizedBox(
-                    height: 150,
-                    width: 100,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
-                      clipBehavior: Clip.hardEdge,
-                      child: Image.asset(
-                        'assets/dummy/img_4.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    child: Icon(
-                      Icons.cancel,
-                      color: Colors.red,
-                    ),
-                    right: 0.0,
-                    top: 0.0,
-                  ),
-                ],
-              );
-            }
-            return Stack(
-              children: [
-                Container(
-                  height: 150,
-                  width: 100,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
-                      border:
-                          Border.all(color: Theme.of(context).primaryColor)),
-                  child: const Icon(
-                    Icons.add_business,
-                    color: Colors.grey,
-                  ),
-                ),
-                const Positioned(
-                  child: Icon(
-                    Icons.cancel,
-                    color: Colors.transparent,
-                  ),
-                  right: 0.0,
-                  top: 0.0,
-                ),
-              ],
-            );
-          }),
-    ]);
+    return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          customText("Property Photo"),
+          Padding(
+            padding: const EdgeInsets.only(
+                left: MyApp.kDefaultPadding,
+                right: MyApp.kDefaultPadding,
+                bottom: MyApp.kDefaultPadding),            child: FutureBuilder<void>(
+              future: BlocProvider.of<ImageCubit>(context).retrieveLostData(),
+              builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return getCircularProgress();
+                  case ConnectionState.done:
+                    return _previewImages();
+                  default:
+                    if (snapshot.hasError) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                        'Pick image: ${snapshot.error}}',
+                        textAlign: TextAlign.center,
+                      )));
+                      return _uploadImage();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text(
+                        'You have not yet picked an image.',
+                        textAlign: TextAlign.center,
+                      )));
+                      return _uploadImage();
+                    }
+                }
+              },
+            ),
+          )
+        ]);
   }
 
   ///  =======================  LOCATION ======================
@@ -973,6 +922,147 @@ class _UploadState extends State<Upload> {
     }
   }
 
+  Widget _previewImages() {
+    return BlocConsumer<ImageCubit, ImageState>(
+        bloc: BlocProvider.of<ImageCubit>(context),
+        builder: (context, state) {
+          if (state is ImageSuccess) {
+            return Semantics(
+                child: GridView.builder(
+                  key: UniqueKey(),
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 5,
+                    crossAxisSpacing: 5,
+                    childAspectRatio: 1 / 1.57,
+                  ),
+                  itemCount: state.imageFileList!.length + 1,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (index < state.imageFileList!.length) {
+                      return FadedScaleAnimation(
+                        fadeCurve: Curves.linearToEaseOut,
+                        child: Semantics(
+                          label: 'Image $index',
+                          child: Stack(
+                            children: [
+                              SizedBox(
+                                height: 150,
+                                width: 100,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: Image.file(
+                                      File(state.imageFileList![index].path),
+                                      fit: BoxFit.cover),
+                                ),
+                              ),
+                              Positioned(
+                                child: InkWell(
+                                  onTap: () =>
+                                      BlocProvider.of<ImageCubit>(context)
+                                          .removePhoto(index),
+                                  child: const Icon(
+                                    Icons.cancel,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                right: 0.0,
+                                top: 0.0,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                    return _uploadImage();
+                  },
+                ),
+                label: 'Select Photo');
+          }
+
+          return _uploadImage();
+        },
+        listener: (context, state) {
+          if (state is ImageUnSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+              'Image error: ${state.message}',
+              textAlign: TextAlign.center,
+            )));
+            state.message = null;
+          }
+        });
+  }
+
+  Widget _uploadImage() {
+    return InkWell(
+      onTap: () => showSheet(context),
+      child: Stack(
+        children: [
+          Container(
+            height: 150,
+            width: 100,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                border: Border.all(color: Theme.of(context).primaryColor)),
+            child: const Icon(
+              Icons.add_business,
+              color: Colors.grey,
+            ),
+          ),
+          const Positioned(
+            child: Icon(
+              Icons.cancel,
+              color: Colors.transparent,
+            ),
+            right: 0.0,
+            top: 0.0,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showSheet(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            height: 140.0,
+            color: MyApp.kDefaultBackgroundColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                FloatingActionButton(
+                  onPressed: () {
+                    BlocProvider.of<ImageCubit>(context).onImageButtonPressed(
+                        ImageSource.gallery,
+                        isMultiImage: true);
+                    Navigator.of(context).pop();
+                  },
+                  backgroundColor: MyApp.kDefaultButtonColorBlack,
+                  heroTag: 'image0',
+                  tooltip: 'Pick Image from gallery',
+                  child: const Icon(Icons.photo_library),
+                ),
+                FloatingActionButton(
+                  onPressed: () {
+                    BlocProvider.of<ImageCubit>(context)
+                        .onImageButtonPressed(ImageSource.camera);
+                    Navigator.of(context).pop();
+                  },
+                  backgroundColor: MyApp.kDefaultButtonColorBlack,
+                  heroTag: 'image1',
+                  tooltip: 'Take a Photo',
+                  child: const Icon(Icons.camera_alt),
+                ),
+              ],
+            ),
+          );
+        });
+  }
 }
 
 class CustomChip extends StatefulWidget {
@@ -1035,53 +1125,3 @@ class _CustomChipState extends State<CustomChip> {
     );
   }
 }
-
-// Padding(
-//   padding: const EdgeInsets.all(MyApp.kDefaultPadding),
-//   child: Wrap(
-//     spacing: 8.0, // gap between adjacent chips
-//     runSpacing: 4.0,
-//     children: [...generateTags(currentIndex)],
-//   ),
-// ),
-
-// switch (key) {
-//   case 0:
-//     return types.values.first.map((e) => customChip(e)).toList();
-//   case 2:
-//     return types.values.last.map((e) => customChip(e)).toList();
-//   default:
-//     return types.values.elementAt(1).map((e) => customChip(e)).toList();
-// }
-
-// customChip(String title) {
-//   bool isActive = false;
-//
-//   return FadedSlideAnimation(
-//     child: ChoiceChip(
-//       selected: isActive,
-//       selectedColor: Colors.grey[300],
-//       disabledColor: Colors.transparent,
-//       label: Text(title,
-//           style: TextStyle(
-//             color: isActive ? Colors.black : Colors.grey,
-//           )),
-//       backgroundColor: Colors.grey[300],
-//       visualDensity: VisualDensity.adaptivePlatformDensity,
-//       shape: RoundedRectangleBorder(
-//         side: BorderSide(
-//             color: isActive ? Colors.black : Colors.transparent,
-//             width: isActive ? 1 : 0),
-//         borderRadius: BorderRadius.circular(10),
-//       ),
-//       onSelected: (bool value) {
-//         setState(() {
-//           isActive = value;
-//         });
-//       },
-//     ),
-//     beginOffset: const Offset(0, 0.3),
-//     endOffset: const Offset(0, 0),
-//     slideCurve: Curves.linearToEaseOut,
-//   );
-// }

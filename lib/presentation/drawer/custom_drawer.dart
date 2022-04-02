@@ -124,7 +124,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                           context: context,
                           title: MyApp.aboutUs,
                           function: () {
-                            aboutUs();
+                             aboutUs();
                           }),
                     ],
                   ),
@@ -176,9 +176,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 Icons.star,
                 color: Colors.amber,
               ),
-              onRatingUpdate: (rating) {
-                print(rating);
-              },
+              onRatingUpdate: (rating) {},
             )
           ],
         );

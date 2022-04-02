@@ -9,6 +9,7 @@ import 'package:peak_property/business_logic/cubit/registration_cubit/registrati
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/core/theme.dart';
 
+import 'business_logic/cubit/image_cubit/image_cubit.dart';
 import 'business_logic/cubit/login_cubit/login_cubit.dart';
 import 'core/routes.dart';
 
@@ -33,6 +34,7 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => RegistrationCubit()),
         BlocProvider(create: (context) => LoginCubit()),
         BlocProvider(create: (context) => LogoutCubit()),
+        BlocProvider(create: (context) => ImageCubit()),
       ],
       child: const PeakProperty(),
     );
