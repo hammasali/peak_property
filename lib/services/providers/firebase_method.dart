@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:peak_property/services/models/upload_model.dart';
 
 class FirebaseMethod {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -61,4 +65,21 @@ class FirebaseMethod {
       .collection('users')
       .doc(getCurrentUser()!.uid)
       .set(model);
+
+  Future<void> uploadPropertyData(UploadModel model) async {
+    await _firestore
+        .collection('users')
+        .doc(getCurrentUser()!.uid)
+        .collection('properties')
+        .doc()
+        .set(model.toMap());
+
+    if (model.pickedFile != null) {
+      await Future.wait(model.pickedFile!.map((image) async =>
+      await firebase_storage.FirebaseStorage.instance
+          .ref('property/${getCurrentUser()!.uid}')
+          .child(image.name)
+          .putFile(File(image.path))));
+    }
+  }
 }

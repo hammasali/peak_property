@@ -49,6 +49,7 @@ dependencies:
   firebase_auth: ^3.3.11
   firebase_core: ^1.13.1
   cloud_firestore: ^3.1.10
+  firebase_storage: ^10.2.10
   flutter_bloc: ^8.0.1
   google_sign_in: ^5.2.4
   flutter_native_splash: ^2.1.1
@@ -84,7 +85,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-    # To upload assets to your application, upload an assets section, like this:
+    # To upload_bloc assets to your application, upload_bloc an assets section, like this:
   assets:
     - assets/
     - assets/dummy/
@@ -96,7 +97,7 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
 
-  # To upload custom fonts to your application, upload a fonts section here,
+  # To upload_bloc custom fonts to your application, upload_bloc a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For

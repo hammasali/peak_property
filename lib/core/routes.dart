@@ -24,7 +24,7 @@ class Routes {
   static const String conversationScreen = '/conversationScreen';
   static const String profile = '/profile';
   static const String editProfile = '/editProfile';
-  static const String upload = '/upload';
+  static const String upload = '/upload_bloc';
   static const String placeBid = '/placeBid';
 }
 

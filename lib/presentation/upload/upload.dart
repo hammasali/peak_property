@@ -6,10 +6,16 @@ import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:peak_property/business_logic/bloc/upload_bloc/upload_bloc.dart';
 import 'package:peak_property/business_logic/cubit/image_cubit/image_cubit.dart';
+import 'package:peak_property/business_logic/cubit/upload_cubits/preference_cubit.dart';
+import 'package:peak_property/business_logic/cubit/upload_cubits/property_type_cubit.dart';
+
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/custom/custom_button.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+
+String? propertyTypeVariable = 'House';
 
 class Upload extends StatefulWidget {
   const Upload({Key? key}) : super(key: key);
@@ -20,28 +26,23 @@ class Upload extends StatefulWidget {
 
 class _UploadState extends State<Upload> {
   String _selectedAreaUnit = 'Marla';
+  List<XFile>? _pickedFile;
 
   int _groupValue = 0;
 
   var currentIndex = 0;
 
+  String? _propertyCategory = 'Homes';
+
   int bedTag = 5;
   int bathTag = 1;
+  String noOfBath = '2';
+  String noOfBeds = '4';
 
   double currentTime = 3;
   double minTime = 1;
   double maxTime = 9;
   int timeDivision = 8;
-
-  double currentBed = 3;
-  double minBed = 1;
-  double maxBed = 11;
-  int bedDivision = 10;
-
-  double currentBath = 2;
-  double minBath = 1;
-  double maxBath = 11;
-  int bathDivision = 10;
 
   double currentArea = 300;
   double minArea = 0;
@@ -118,6 +119,11 @@ class _UploadState extends State<Upload> {
     startController.addListener(_setStartValue);
     endController.addListener(_setEndValue);
     areaController.addListener(_setAreaValue);
+    stateValue = '';
+    cityValue = '';
+    addressController.text = '';
+    tittleController.text = '';
+    descriptionController.text = '';
   }
 
   @override
@@ -172,25 +178,40 @@ class _UploadState extends State<Upload> {
               const Divider(thickness: 2.0),
               propertyType(),
               const Divider(thickness: 2.0),
-              _groupValue == 0 ? priceRange() : timeframe(),
+              BlocBuilder<PreferenceCubit, int>(
+                  builder: (context, state) =>
+                      state == 0 ? priceRange() : timeframe()),
               const Divider(thickness: 2.0),
               propertyArea(),
               const Divider(thickness: 2.0),
-              currentIndex == 0 ? bedrooms() : Container(),
-              currentIndex == 0 ? const Divider(thickness: 2.0) : Container(),
-              currentIndex == 0 ? bathrooms() : Container(),
-              const Padding(
-                padding: EdgeInsets.all(MyApp.kDefaultPadding),
-                child: CustomButton(
-                  label: 'Upload',
-                  width: double.infinity,
-                  icon: Icon(
-                    Icons.cloud_upload,
-                    color: Colors.white,
-                  ),
-                  textColor: Colors.white,
-                ),
-              ),
+              BlocBuilder<PropertyTypeCubit, int>(
+                  builder: (context, state) => state == 0
+                      ? Column(
+                          children: [
+                            bedrooms(),
+                            const Divider(thickness: 2.0),
+                            bathrooms()
+                          ],
+                        )
+                      : Container()),
+              BlocConsumer<UploadBloc, UploadState>(builder: (context, state) {
+                if (state is UploadLoading) {
+                  return Padding(
+                      padding: const EdgeInsets.all(MyApp.kDefaultPadding),
+                      child: getCircularProgress());
+                }
+
+                return button();
+              }, listener: (context, state) {
+                if (state is UploadSuccess) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Upload Successfully.')));
+                } else if (state is UploadUnSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(state.message.toString())));
+                }
+              })
             ],
           ),
         ),
@@ -209,7 +230,8 @@ class _UploadState extends State<Upload> {
             padding: const EdgeInsets.only(
                 left: MyApp.kDefaultPadding,
                 right: MyApp.kDefaultPadding,
-                bottom: MyApp.kDefaultPadding),            child: FutureBuilder<void>(
+                bottom: MyApp.kDefaultPadding),
+            child: FutureBuilder<void>(
               future: BlocProvider.of<ImageCubit>(context).retrieveLostData(),
               builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                 switch (snapshot.connectionState) {
@@ -255,79 +277,42 @@ class _UploadState extends State<Upload> {
             showStates: true,
             showCities: true,
             flagState: CountryFlag.ENABLE,
-
-            ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
             dropdownDecoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 color: Colors.white,
                 border: Border.all(color: Colors.grey.shade300, width: 1)),
-
-            ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
             disabledDropdownDecoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 color: Colors.grey.shade300,
                 border: Border.all(color: Colors.grey.shade300, width: 1)),
-
-            ///placeholders for dropdown search field
             countrySearchPlaceholder: "Country",
             stateSearchPlaceholder: "State",
             citySearchPlaceholder: "City",
-
-            ///labels for dropdown
             countryDropdownLabel: "*Country",
             stateDropdownLabel: "*State",
             cityDropdownLabel: "*City",
-
-            ///Default Country
             defaultCountry: DefaultCountry.Pakistan,
-
-            ///Disable country dropdown (Note: use it with default country)
             disableCountry: true,
-
-            ///selected item style [OPTIONAL PARAMETER]
             selectedItemStyle: const TextStyle(
               color: Colors.black,
               fontSize: 14,
             ),
-
-            ///DropdownDialog Heading style [OPTIONAL PARAMETER]
             dropdownHeadingStyle: const TextStyle(
                 color: Colors.black, fontSize: 17, fontWeight: FontWeight.bold),
-
-            ///DropdownDialog Item style [OPTIONAL PARAMETER]
             dropdownItemStyle: const TextStyle(
               color: Colors.black,
               fontSize: 14,
             ),
-
-            ///Dialog box radius [OPTIONAL PARAMETER]
             dropdownDialogRadius: 10.0,
-
-            ///Search bar radius [OPTIONAL PARAMETER]
             searchBarRadius: 10.0,
-
-            ///triggers once country selected in dropdown
             onCountryChanged: (value) {
-              setState(() {
-                ///store value in country variable
-                countryValue = value;
-              });
+              countryValue = value;
             },
-
-            ///triggers once state selected in dropdown
             onStateChanged: (value) {
-              setState(() {
-                ///store value in state variable
-                stateValue = value;
-              });
+              stateValue = value;
             },
-
-            ///triggers once city selected in dropdown
             onCityChanged: (value) {
-              setState(() {
-                ///store value in city variable
-                cityValue = value;
-              });
+              cityValue = value;
             },
           ),
         ),
@@ -344,7 +329,7 @@ class _UploadState extends State<Upload> {
             maxLines: null,
             cursorColor: Colors.black,
             decoration: const InputDecoration(
-              label: Text('* Address'),
+              label: Text('*Address'),
               fillColor: Colors.black,
               isDense: true,
               hintStyle: TextStyle(color: Colors.grey),
@@ -371,16 +356,8 @@ class _UploadState extends State<Upload> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            _myRadioButton(
-              title: "Fixed Price",
-              value: 0,
-              onChanged: (newValue) => setState(() => _groupValue = newValue),
-            ),
-            _myRadioButton(
-              title: "Bid Price",
-              value: 1,
-              onChanged: (newValue) => setState(() => _groupValue = newValue),
-            ),
+            _myRadioButton("Fixed Price", 0),
+            _myRadioButton("Bid Price", 1),
           ],
         ),
       ],
@@ -406,7 +383,7 @@ class _UploadState extends State<Upload> {
             maxLines: null,
             cursorColor: Colors.black,
             decoration: const InputDecoration(
-              label: Text('* Title'),
+              label: Text('*Title'),
               fillColor: Colors.black,
               isDense: true,
               hintStyle: TextStyle(color: Colors.grey),
@@ -433,7 +410,7 @@ class _UploadState extends State<Upload> {
             maxLines: null,
             cursorColor: Colors.black,
             decoration: const InputDecoration(
-              label: Text('* Description'),
+              label: Text('*Description'),
               fillColor: Colors.black,
               isDense: true,
               hintStyle: TextStyle(color: Colors.grey),
@@ -457,23 +434,32 @@ class _UploadState extends State<Upload> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         customText("Property Type"),
-        Center(
-          child: ToggleSwitch(
-            initialLabelIndex: currentIndex,
-            totalSwitches: 3,
-            minHeight: 50.0,
-            minWidth: 100.0,
-            animate: true,
-            animationDuration: 500,
-            labels: [...types.keys],
-            onToggle: (index) {
-              setState(() {
-                currentIndex = index;
-              });
-            },
-          ),
+        BlocBuilder<PropertyTypeCubit, int>(
+          builder: (context, state) {
+            currentIndex = state;
+            return Column(
+              children: [
+                Center(
+                  child: ToggleSwitch(
+                    initialLabelIndex: currentIndex,
+                    totalSwitches: 3,
+                    minHeight: 50.0,
+                    minWidth: 100.0,
+                    animate: true,
+                    animationDuration: 500,
+                    labels: [...types.keys],
+                    onToggle: (index) {
+                      BlocProvider.of<PropertyTypeCubit>(context)
+                          .onPropertyTypeEvent(index);
+                      _propertyCategory = types.keys.elementAt(index);
+                    },
+                  ),
+                ),
+                generateTags(currentIndex),
+              ],
+            );
+          },
         ),
-        generateTags(currentIndex),
       ],
     );
   }
@@ -558,24 +544,31 @@ class _UploadState extends State<Upload> {
           ),
         ),
         const SizedBox(height: 10.0),
-        RangeSlider(
-          values: RangeValues(_starValue, _endValue),
-          min: minValue,
-          max: maxValue,
-          divisions: 200,
-          labels: RangeLabels(
-            range(_starValue.round()),
-            range(_endValue.round()),
-          ),
-          onChanged: (RangeValues values) {
-            setState(() {
-              _starValue = values.start.roundToDouble();
-              _endValue = values.end.roundToDouble();
-              startController.text = values.start.round().toString();
-              endController.text = values.end.round().toString();
-            });
+        BlocBuilder<UploadBloc, UploadState>(
+          builder: (context, state) {
+            if (state is PriceRangeState) {
+              _starValue = state.start;
+              _endValue = state.end;
+            }
+
+            return RangeSlider(
+              values: RangeValues(_starValue, _endValue),
+              min: minValue,
+              max: maxValue,
+              divisions: 200,
+              labels: RangeLabels(
+                range(_starValue.round()),
+                range(_endValue.round()),
+              ),
+              onChanged: (RangeValues values) {
+                BlocProvider.of<UploadBloc>(context).add(PriceRangeEvent(
+                    values.start.roundToDouble(), values.end.roundToDouble()));
+                startController.text = values.start.round().toString();
+                endController.text = values.end.round().toString();
+              },
+              activeColor: Colors.black,
+            );
           },
-          activeColor: Colors.black,
         ),
       ],
     );
@@ -592,18 +585,25 @@ class _UploadState extends State<Upload> {
             Text('(${timeframeRange(currentTime.round())})')
           ],
         ),
-        Slider(
-          value: currentTime,
-          min: minTime,
-          max: maxTime,
-          divisions: timeDivision,
-          label: timeframeRange(currentTime.round()),
-          onChanged: (value) {
-            setState(() {
-              currentTime = value.roundToDouble();
-            });
+        BlocBuilder<UploadBloc, UploadState>(
+          builder: (context, state) {
+            if (state is TimeframeState) {
+              currentTime = state.value.roundToDouble();
+            }
+            return Slider(
+              value: currentTime,
+              min: minTime,
+              max: maxTime,
+              divisions: timeDivision,
+              label: timeframeRange(currentTime.round()),
+              onChanged: (value) {
+                BlocProvider.of<UploadBloc>(context)
+                    .add(TimeFrameEvent(value.round()));
+                // currentTime = value.roundToDouble();
+              },
+              activeColor: Colors.black,
+            );
           },
-          activeColor: Colors.black,
         ),
       ],
     );
@@ -619,47 +619,54 @@ class _UploadState extends State<Upload> {
           children: [
             customText('Area Range'),
             const Spacer(),
-            PopupMenuButton(
-                onSelected: (value) {
-                  setState(() {
-                    _selectedAreaUnit = value.toString();
-                  });
-                },
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                initialValue: _areaUnit[3],
-                itemBuilder: (context) {
-                  return _areaUnit
-                      .map(
-                        (value) => PopupMenuItem(
-                          value: value,
-                          child: Text(value),
-                        ),
-                      )
-                      .toList();
-                },
-                offset: const Offset(1, 40),
-                child: Container(
-                  padding: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.brown),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(10))),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(_selectedAreaUnit,
-                          style: const TextStyle(fontSize: 14.0)),
-                      const SizedBox(
-                        width: 3,
+            BlocBuilder<UploadBloc, UploadState>(
+              builder: (context, state) {
+                if (state is AreaRangeUnitState) {
+                  _selectedAreaUnit = state.unit;
+                }
+
+                return PopupMenuButton(
+                    onSelected: (value) {
+                      BlocProvider.of<UploadBloc>(context)
+                          .add(AreaRangeUnitEvent(value.toString()));
+                    },
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                    initialValue: _areaUnit[3],
+                    itemBuilder: (context) {
+                      return _areaUnit
+                          .map(
+                            (value) => PopupMenuItem(
+                              value: value,
+                              child: Text(value),
+                            ),
+                          )
+                          .toList();
+                    },
+                    offset: const Offset(1, 40),
+                    child: Container(
+                      padding: const EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.brown),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10))),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(_selectedAreaUnit,
+                              style: const TextStyle(fontSize: 14.0)),
+                          const SizedBox(
+                            width: 3,
+                          ),
+                          const Icon(
+                            Icons.arrow_downward,
+                            size: 16.0,
+                          ),
+                        ],
                       ),
-                      const Icon(
-                        Icons.arrow_downward,
-                        size: 16.0,
-                      ),
-                    ],
-                  ),
-                )),
+                    ));
+              },
+            ),
             const SizedBox(width: 10.0)
           ],
         ),
@@ -690,20 +697,26 @@ class _UploadState extends State<Upload> {
             ),
           ),
         ),
-        Slider(
-          value: currentArea,
-          min: minArea,
-          max: maxArea,
-          divisions: 500,
-          label: unitArea(currentArea.round().toString(), _selectedAreaUnit),
-          // label: '${currentArea.round().toString()} Marla',
-          onChanged: (value) {
-            setState(() {
-              currentArea = value.roundToDouble();
-              areaController.text = value.round().toString();
-            });
+        BlocBuilder<UploadBloc, UploadState>(
+          builder: (context, state) {
+            if (state is AreaRangeState) {
+              currentArea = state.val;
+            }
+            return Slider(
+              value: currentArea,
+              min: minArea,
+              max: maxArea,
+              divisions: 500,
+              label:
+                  unitArea(currentArea.round().toString(), _selectedAreaUnit),
+              onChanged: (value) {
+                BlocProvider.of<UploadBloc>(context)
+                    .add(AreaRangeEvent(value.roundToDouble()));
+                areaController.text = value.round().toString();
+              },
+              activeColor: Colors.black,
+            );
           },
-          activeColor: Colors.black,
         ),
       ],
     );
@@ -715,37 +728,34 @@ class _UploadState extends State<Upload> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         customText('Bedrooms'),
-        // Slider(
-        //   value: currentBed,
-        //   min: minBed,
-        //   max: maxBed,
-        //   divisions: bedDivision,
-        //   label: currentBed > 10 ? '10+' : currentBed.round().toString(),
-        //   onChanged: (value) {
-        //     setState(() {
-        //       currentBed = value.roundToDouble();
-        //     });
-        //   },
-        //   activeColor: Colors.black,
-        // ),
-        Center(
-          child: ChipsChoice<int>.single(
-            wrapped: true,
-            spacing: 50.0,
-            runSpacing: 15.0,
-            value: bedTag,
-            onChanged: (val) => setState(() => bedTag = val),
-            choiceItems: C2Choice.listFrom<int, String>(
-              source: options,
-              value: (i, v) => i,
-              label: (i, v) => v,
-            ),
-            choiceStyle: const C2ChoiceStyle(
-              padding: EdgeInsets.all(12.0),
-              borderShape: CircleBorder(),
-              color: MyApp.kDefaultButtonColorBlack,
-            ),
-          ),
+        BlocBuilder<UploadBloc, UploadState>(
+          builder: (context, state) {
+            if (state is BedroomState) {
+              bedTag = state.value;
+            }
+            return Center(
+              child: ChipsChoice<int>.single(
+                wrapped: true,
+                spacing: 50.0,
+                runSpacing: 15.0,
+                value: bedTag,
+                onChanged: (val) {
+                  noOfBath = options[val];
+                  BlocProvider.of<UploadBloc>(context).add(BedroomEvent(val));
+                },
+                choiceItems: C2Choice.listFrom<int, String>(
+                  source: options,
+                  value: (i, v) => i,
+                  label: (i, v) => v,
+                ),
+                choiceStyle: const C2ChoiceStyle(
+                  padding: EdgeInsets.all(12.0),
+                  borderShape: CircleBorder(),
+                  color: MyApp.kDefaultButtonColorBlack,
+                ),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -757,38 +767,34 @@ class _UploadState extends State<Upload> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         customText('Bathrooms'),
-        // Slider(
-        //   value: currentBath,
-        //   min: minBath,
-        //   max: maxBath,
-        //   divisions: bathDivision,
-        //   // label: unitArea(currentBed.round().toString(), _selectedAreaUnit),
-        //   label: currentBath > 10 ? '10+' : currentBath.round().toString(),
-        //   onChanged: (value) {
-        //     setState(() {
-        //       currentBath = value.roundToDouble();
-        //     });
-        //   },
-        //   activeColor: Colors.black,
-        // ),
-        Center(
-          child: ChipsChoice<int>.single(
-            wrapped: true,
-            spacing: 50.0,
-            runSpacing: 15.0,
-            value: bathTag,
-            onChanged: (val) => setState(() => bathTag = val),
-            choiceItems: C2Choice.listFrom<int, String>(
-              source: options,
-              value: (i, v) => i,
-              label: (i, v) => v,
-            ),
-            choiceStyle: const C2ChoiceStyle(
-              padding: EdgeInsets.all(12.0),
-              borderShape: CircleBorder(),
-              color: MyApp.kDefaultButtonColorBlack,
-            ),
-          ),
+        BlocBuilder<UploadBloc, UploadState>(
+          builder: (context, state) {
+            if (state is BathroomState) {
+              bathTag = state.value;
+            }
+            return Center(
+              child: ChipsChoice<int>.single(
+                wrapped: true,
+                spacing: 50.0,
+                runSpacing: 15.0,
+                value: bathTag,
+                onChanged: (val) {
+                  noOfBath = options[val];
+                  BlocProvider.of<UploadBloc>(context).add(BathroomEvent(val));
+                },
+                choiceItems: C2Choice.listFrom<int, String>(
+                  source: options,
+                  value: (i, v) => i,
+                  label: (i, v) => v,
+                ),
+                choiceStyle: const C2ChoiceStyle(
+                  padding: EdgeInsets.all(12.0),
+                  borderShape: CircleBorder(),
+                  color: MyApp.kDefaultButtonColorBlack,
+                ),
+              ),
+            );
+          },
         ),
         const Divider(thickness: 2.0),
       ],
@@ -811,9 +817,7 @@ class _UploadState extends State<Upload> {
         double.parse(endController.text).roundToDouble() >= minValue &&
         double.parse(startController.text).roundToDouble() <= maxValue &&
         double.parse(endController.text).roundToDouble() <= maxValue) {
-      setState(() {
-        _starValue = double.parse(startController.text).roundToDouble();
-      });
+      _starValue = double.parse(startController.text).roundToDouble();
     }
   }
 
@@ -826,9 +830,7 @@ class _UploadState extends State<Upload> {
         double.parse(endController.text).roundToDouble() >= minValue &&
         double.parse(startController.text).roundToDouble() <= maxValue &&
         double.parse(endController.text).roundToDouble() <= maxValue) {
-      setState(() {
-        _endValue = double.parse(endController.text).roundToDouble();
-      });
+      _endValue = double.parse(endController.text).roundToDouble();
     }
   }
 
@@ -881,21 +883,27 @@ class _UploadState extends State<Upload> {
     }
   }
 
-  _myRadioButton({String? title, int? value, onChanged}) {
-    return RadioListTile(
-      activeColor: MyApp.kDefaultButtonColorBlack,
-      value: value,
-      groupValue: _groupValue,
-      onChanged: onChanged,
-      title: Text(
-        title!,
-        style: Theme.of(context).textTheme.bodyText1,
-      ),
-      subtitle: Text(value == 0
-          ? 'Where you can set price range of your property and negotiate with dealer'
-          : 'Here you can specify the amount of time and dealer will bid within time frame'),
-      dense: true,
-      visualDensity: VisualDensity.adaptivePlatformDensity,
+  _myRadioButton(String? title, int? value) {
+    return BlocBuilder<PreferenceCubit, int>(
+      builder: (context, state) {
+        _groupValue = state;
+        return RadioListTile(
+          activeColor: MyApp.kDefaultButtonColorBlack,
+          value: value,
+          groupValue: _groupValue,
+          onChanged: (dynamic val) =>
+              BlocProvider.of<PreferenceCubit>(context).onPreferenceEvent(val),
+          title: Text(
+            title!,
+            style: Theme.of(context).textTheme.bodyText1,
+          ),
+          subtitle: Text(value == 0
+              ? 'Where you can set price range of your property and negotiate with dealer'
+              : 'Here you can specify the amount of time and dealer will bid within time frame'),
+          dense: true,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        );
+      },
     );
   }
 
@@ -927,6 +935,8 @@ class _UploadState extends State<Upload> {
         bloc: BlocProvider.of<ImageCubit>(context),
         builder: (context, state) {
           if (state is ImageSuccess) {
+            _pickedFile = state.imageFileList;
+
             return Semantics(
                 child: GridView.builder(
                   key: UniqueKey(),
@@ -1063,6 +1073,53 @@ class _UploadState extends State<Upload> {
           );
         });
   }
+
+  button() {
+    return Padding(
+      padding: const EdgeInsets.all(MyApp.kDefaultPadding),
+      child: CustomButton(
+        onTap: () {
+          if (stateValue != null &&
+              cityValue != null &&
+              addressController.text.isNotEmpty) {
+            if (tittleController.text.isNotEmpty &&
+                descriptionController.text.isNotEmpty) {
+              BlocProvider.of<UploadBloc>(context).add(UploadButtonEvent(
+                  state: stateValue,
+                  city: cityValue,
+                  address: addressController.text,
+                  preference: _groupValue,
+                  description: descriptionController.text.trim(),
+                  title: tittleController.text.trim(),
+                  type: propertyTypeVariable,
+                  category: _propertyCategory,
+                  endPrice: endController.text,
+                  timeRange: currentTime,
+                  startPrice: startController.text,
+                  areaRange: areaController.text,
+                  areaType: _selectedAreaUnit,
+                  bathrooms: noOfBath,
+                  bedrooms: noOfBeds,
+                  pickedFile: _pickedFile));
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('Provide Complete Information Of Property!!')));
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Provide Complete Location!!')));
+          }
+        },
+        label: 'Upload',
+        width: double.infinity,
+        icon: const Icon(
+          Icons.cloud_upload,
+          color: Colors.white,
+        ),
+        textColor: Colors.white,
+      ),
+    );
+  }
 }
 
 class CustomChip extends StatefulWidget {
@@ -1109,6 +1166,8 @@ class _CustomChipState extends State<CustomChip> {
               onSelected: (value) {
                 setState(() {
                   defaultChoiceIndex = value ? index : defaultChoiceIndex;
+                  propertyTypeVariable =
+                      widget.title[defaultChoiceIndex as int];
                 });
               },
               // backgroundColor: color,

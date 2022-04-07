@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:peak_property/services/models/upload_model.dart';
 import 'package:peak_property/services/providers/firebase_method.dart';
 
 class FirebaseRepo {
@@ -35,4 +36,7 @@ class FirebaseRepo {
 
   Future<void> addNewUserData(var model) async =>
       await _firebaseMethod.addNewUserData(model);
+
+  Future<void> uploadPropertyData(UploadModel model) async =>
+      await _firebaseMethod.uploadPropertyData(model);
 }

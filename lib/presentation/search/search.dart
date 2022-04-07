@@ -16,6 +16,7 @@ class _SearchState extends State<Search> {
 
   var currentIndex = 0;
 
+
   double currentBed = 3;
   double minBed = 1;
   double maxBed = 11;
@@ -180,6 +181,7 @@ class _SearchState extends State<Search> {
             onToggle: (index) {
               setState(() {
                 currentIndex = index;
+
               });
             },
           ),
@@ -190,6 +192,7 @@ class _SearchState extends State<Search> {
   }
 
   generateTags(int key) {
+
     switch (key) {
       case 0:
         return CustomChip(title: types.values.first.toList());

@@ -4,13 +4,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:peak_property/business_logic/bloc/auth_bloc/auth_bloc.dart';
 import 'package:peak_property/business_logic/cubit/logout_cubit/logout_cubit.dart';
+
 import 'package:peak_property/business_logic/cubit/registration_cubit/registration_cubit.dart';
 
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/core/theme.dart';
 
+import 'business_logic/bloc/upload_bloc/upload_bloc.dart';
 import 'business_logic/cubit/image_cubit/image_cubit.dart';
 import 'business_logic/cubit/login_cubit/login_cubit.dart';
+import 'business_logic/cubit/upload_cubits/preference_cubit.dart';
+import 'business_logic/cubit/upload_cubits/property_type_cubit.dart';
 import 'core/routes.dart';
 
 void main() async {
@@ -35,6 +39,9 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => LoginCubit()),
         BlocProvider(create: (context) => LogoutCubit()),
         BlocProvider(create: (context) => ImageCubit()),
+        BlocProvider(create: (context) => UploadBloc()),
+        BlocProvider(create: (context) => PreferenceCubit()),
+        BlocProvider(create: (context) => PropertyTypeCubit()),
       ],
       child: const PeakProperty(),
     );
