@@ -817,7 +817,10 @@ class _UploadState extends State<Upload> {
         double.parse(endController.text).roundToDouble() >= minValue &&
         double.parse(startController.text).roundToDouble() <= maxValue &&
         double.parse(endController.text).roundToDouble() <= maxValue) {
-      _starValue = double.parse(startController.text).roundToDouble();
+      // _starValue = double.parse(startController.text).roundToDouble();
+
+      BlocProvider.of<UploadBloc>(context).add(PriceRangeEvent(
+          double.parse(startController.text).roundToDouble(), _endValue));
     }
   }
 
@@ -830,15 +833,21 @@ class _UploadState extends State<Upload> {
         double.parse(endController.text).roundToDouble() >= minValue &&
         double.parse(startController.text).roundToDouble() <= maxValue &&
         double.parse(endController.text).roundToDouble() <= maxValue) {
-      _endValue = double.parse(endController.text).roundToDouble();
+      // _endValue = double.parse(endController.text).roundToDouble();
+      BlocProvider.of<UploadBloc>(context).add(PriceRangeEvent(
+          _starValue, double.parse(endController.text).roundToDouble()));
     }
   }
 
   _setAreaValue() {
     if (areaController.text == '') return;
-    setState(() {
-      currentArea = double.parse(areaController.text).roundToDouble();
-    });
+
+    if (double.parse(areaController.text).roundToDouble() >= minArea &&
+        double.parse(areaController.text).roundToDouble() <= maxArea) {
+      BlocProvider.of<UploadBloc>(context).add(
+          AreaRangeEvent(double.parse(areaController.text).roundToDouble()));
+    }
+    // currentArea = double.parse(areaController.text).roundToDouble();
   }
 
   range(int price) {
