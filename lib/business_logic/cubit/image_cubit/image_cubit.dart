@@ -10,7 +10,7 @@ class ImageCubit extends Cubit<ImageState> {
   ImageCubit() : super(ImageInitial());
 
   Future<void> onImageButtonPressed(ImageSource source,
-      {bool isMultiImage = false}) async {
+      {bool isMultiImage = false, bool isProfileImage = false}) async {
     if (isMultiImage) {
       try {
         _imageFileList = await _picker.pickMultiImage();
@@ -25,7 +25,10 @@ class ImageCubit extends Cubit<ImageState> {
           source: source,
         );
         _imageFileList = pickedFile == null ? null : <XFile>[pickedFile];
-        emit(ImageSuccess(imageFileList: _imageFileList));
+        isProfileImage
+            ? emit(ProfileImageSuccess(imageFileList: _imageFileList?[0]))
+            : emit(ImageSuccess(imageFileList: _imageFileList));
+
       } catch (e) {
         emit(ImageUnSuccess(message: e.toString()));
       }

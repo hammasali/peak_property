@@ -29,9 +29,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           TabBarView(
             physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
-            children:  const [
+            children:   [
               Fixed(),
-              Bid(),
+              const Bid(),
             ],
           ),
 

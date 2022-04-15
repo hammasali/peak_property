@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_chat/models/peer_user.dart';
 import 'package:peak_property/services/models/upload_model.dart';
+import 'package:peak_property/services/models/user_info_model.dart';
 import 'package:peak_property/services/providers/firebase_method.dart';
 
 class FirebaseRepo {
@@ -39,4 +42,12 @@ class FirebaseRepo {
 
   Future<void> uploadPropertyData(UploadModel model) async =>
       await _firebaseMethod.uploadPropertyData(model);
+
+  Future<void> updateProfile(UserInfoModel model) async =>
+      await _firebaseMethod.updateProfile(model);
+
+  Query getFixedHomes() => _firebaseMethod.getFixedHomes();
+
+  Future<String> downloadAllUserURLs(String uid, String image) async =>
+      _firebaseMethod.downloadAllUserURLs(uid, image);
 }

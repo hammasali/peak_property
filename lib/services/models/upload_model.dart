@@ -19,7 +19,9 @@ class UploadModel {
   String? bedrooms;
   String? bathrooms;
   String? createdAt;
-  List<String>? pickedFilesName;
+  String? uid;
+  String? thumbnail;
+  List<dynamic>? pickedFilesName;
   List<XFile>? pickedFile;
 
   UploadModel(
@@ -40,12 +42,15 @@ class UploadModel {
       this.bathrooms,
       this.createdAt,
       this.pickedFilesName,
+      this.uid,
+      this.thumbnail,
       this.pickedFile});
 
   Map<String, dynamic> toMap() {
     return {
       'state': state,
       'city': city,
+      'uid': uid,
       'address': address,
       'preference': preference,
       'title': title,
@@ -64,10 +69,11 @@ class UploadModel {
     };
   }
 
-  factory UploadModel.fromMap(Map<String, dynamic> map) {
+  factory UploadModel.fromMap(Map<String, dynamic> map, [String? imageUrl]) {
     return UploadModel(
       state: map['state'] as String,
       city: map['city'] as String,
+      uid: map['uid'] as String,
       address: map['address'] as String,
       preference: map['preference'] as String,
       title: map['title'] as String,
@@ -82,6 +88,8 @@ class UploadModel {
       bedrooms: map['bedrooms'] as String,
       bathrooms: map['bathrooms'] as String,
       createdAt: map['createdAt'] as String,
+      pickedFilesName: map['pickedFilesName'],
+      thumbnail: imageUrl
       // pickedFile: map['pickedFile'] as List<XFile>,
     );
   }

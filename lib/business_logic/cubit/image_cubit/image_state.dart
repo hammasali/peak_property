@@ -10,6 +10,12 @@ class ImageSuccess extends ImageState {
   ImageSuccess({this.imageFileList});
 }
 
+class ProfileImageSuccess extends ImageState {
+  XFile? imageFileList;
+
+  ProfileImageSuccess({this.imageFileList});
+}
+
 class ImageUnSuccess extends ImageState {
   String? message;
 

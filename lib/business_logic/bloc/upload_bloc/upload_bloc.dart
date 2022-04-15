@@ -1,4 +1,3 @@
-
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
@@ -55,6 +54,7 @@ class UploadBloc extends Bloc<UploadEvent, UploadState> {
           title: event.title,
           type: event.type,
           createdAt: _createdAt,
+          uid: FirebaseRepo.instance.getCurrentUser()!.uid,
           preference: event.preference == 0 ? 'Fixed Price' : 'Bid Price',
         );
 

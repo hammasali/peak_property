@@ -945,7 +945,9 @@ class _UploadState extends State<Upload> {
         builder: (context, state) {
           if (state is ImageSuccess) {
             _pickedFile = state.imageFileList;
-
+          if(_pickedFile == null) {
+            return _uploadImage();
+          } else {
             return Semantics(
                 child: GridView.builder(
                   key: UniqueKey(),
@@ -999,6 +1001,7 @@ class _UploadState extends State<Upload> {
                   },
                 ),
                 label: 'Select Photo');
+          }
           }
 
           return _uploadImage();

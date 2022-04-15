@@ -54,10 +54,10 @@ class MyApp {
   static const String profileInfo = 'Profile Info';
   static const String fullName = 'Full Name';
   static const String username = 'Username';
-  static const String bio = 'Bio';
+  static const String phoneNo = 'Phone No';
   static const String emailAddress = 'Email Address';
   static const String aboutHint = 'Tell something about property...';
-  static const String saveProfile = 'Save Profile';
+  static const String updateProfile = 'Update Profile';
 
   static const String scaffoldMsg = '  Please agree to terms.';
 

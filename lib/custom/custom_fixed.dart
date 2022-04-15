@@ -4,13 +4,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:peak_property/core/my_app.dart';
 
 class CustomFixed extends StatelessWidget {
-  final String image, city, price,title;
+  final String image, city, startPrice,endPrice,title;
 
   const CustomFixed({
     Key? key,
     required this.image,
     required this.city,
-    required this.price,
+    required this.endPrice,
+    required this.startPrice,
     required this.title
   }) : super(key: key);
 
@@ -41,7 +42,7 @@ class CustomFixed extends StatelessWidget {
                     SizedBox(
                       width: 150,
                       child: AutoSizeText(
-                        price,
+                        '$startPrice - $endPrice' ,
                         style: Theme.of(context).textTheme.headline4,
                         maxLines: 2,
                         minFontSize: 15.0,
@@ -85,7 +86,7 @@ class CustomFixed extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20.0),
                     child: Image(
-                      image: AssetImage(image),
+                      image: NetworkImage(image),
                       height: 180.0,
                       width: 180.0,
                       fit: BoxFit.cover,
@@ -97,7 +98,7 @@ class CustomFixed extends StatelessWidget {
                   bottom: 10.0,
                   child: Container(
                     width: 180.0,
-                    height: 50.0,
+                    height: 55.0,
                     padding: const EdgeInsets.symmetric(
                         horizontal: MyApp.kDefaultPadding, vertical: 4),
                     decoration: BoxDecoration(
@@ -107,6 +108,8 @@ class CustomFixed extends StatelessWidget {
                             bottomLeft: Radius.circular(10.0))),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                          SizedBox(
                           width: 150,
@@ -114,35 +117,32 @@ class CustomFixed extends StatelessWidget {
                             title,
                             maxLines: 2,
                             minFontSize: 11.0,
-                            maxFontSize: 20.0,
+                            maxFontSize: 14.0,
                             overflow: TextOverflow.ellipsis,
                             softWrap: true,
                             style: const TextStyle(
-                              fontSize: 23.0,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 1.0,
                               color: Colors.white,
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: Row(
-                            children:  [
-                              const Icon(
-                                FontAwesomeIcons.locationArrow,
-                                size: 8.0,
-                                color: Colors.white54,
-                              ),
-                              const SizedBox(
-                                width: 5.0,
-                              ),
-                              Text(
-                                city,
-                                style: const TextStyle(
-                                    color: Colors.white54, fontSize: 12),
-                              ),
-                            ],
-                          ),
+                        Row(
+                          children:  [
+                            const Icon(
+                              FontAwesomeIcons.locationArrow,
+                              size: 8.0,
+                              color: Colors.white54,
+                            ),
+                            const SizedBox(
+                              width: 5.0,
+                            ),
+                            Text(
+                              city,
+                              style: const TextStyle(
+                                  color: Colors.white54, fontSize: 12),
+                            ),
+                          ],
                         ),
                       ],
                     ),

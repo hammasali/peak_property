@@ -1,3 +1,5 @@
+import 'package:camera_capture/camera_capture.dart';
+import 'package:draw_page/draw_page.dart';
 import 'package:flutter/material.dart';
 import 'package:peak_property/auth/login/login_screen.dart';
 import 'package:peak_property/auth/register/register_screen.dart';
@@ -26,6 +28,8 @@ class Routes {
   static const String editProfile = '/editProfile';
   static const String upload = '/upload_bloc';
   static const String placeBid = '/placeBid';
+  static const String cameraPage = '/cameraPage';
+  static const String drawPage = '/drawPage';
 }
 
 class RouteNavigator extends StatelessWidget {
@@ -36,7 +40,6 @@ class RouteNavigator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return WillPopScope(
       onWillPop: () async {
         var canPop = navigatorKey.currentState!.canPop();
@@ -96,6 +99,18 @@ class RouteNavigator extends StatelessWidget {
             case Routes.upload:
               builder = (BuildContext _) => const Upload();
               break;
+
+            // case Routes.cameraPage:
+            //   builder = (BuildContext _) => CameraPage();
+            //   break;
+            //
+            // case Routes.drawPage:
+            //   final args = settings.arguments as DrawPageArgs;
+            //   builder = (BuildContext _) => DrawPage(
+            //         imageData: args.uint8list,
+            //         loadingWidget: args.widget,
+            //       );
+            //   break;
           }
           return MaterialPageRoute(builder: builder, settings: settings);
         },

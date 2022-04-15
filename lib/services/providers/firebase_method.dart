@@ -2,9 +2,12 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_chat/models/peer_user.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:peak_property/services/models/upload_model.dart';
+import 'package:peak_property/services/models/user_info_model.dart';
 
 class FirebaseMethod {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -59,7 +62,7 @@ class FirebaseMethod {
     return result.user;
   }
 
-  ///  =========  Database   ========== ///
+  ///  =========  Database  Add ========== ///
 
   Future<void> addNewUserData(var model) async => await _firestore
       .collection('users')
@@ -76,10 +79,44 @@ class FirebaseMethod {
 
     if (model.pickedFile != null) {
       await Future.wait(model.pickedFile!.map((image) async =>
-      await firebase_storage.FirebaseStorage.instance
-          .ref('property/${getCurrentUser()!.uid}')
-          .child(image.name)
-          .putFile(File(image.path))));
+          await firebase_storage.FirebaseStorage.instance
+              .ref('property/${getCurrentUser()!.uid}')
+              .child(image.name)
+              .putFile(File(image.path))));
     }
+  }
+
+  ///  =========  Database  Update ========== ///
+
+  Future<void> updateProfile(UserInfoModel model) async {
+    await _firestore
+        .collection('users')
+        .doc(getCurrentUser()!.uid)
+        .update(model.toMapUpdateProfile());
+
+    if (model.profilePhoto != null) {
+      await firebase_storage.FirebaseStorage.instance
+          .ref('profile/${getCurrentUser()!.uid}')
+          .putFile(File(model.profilePhoto!.path));
+    }
+  }
+
+  ///  =========  Database  Get ========== ///
+
+  Query getFixedHomes() {
+    return _firestore
+        .collectionGroup('properties')
+        .where('preference', isEqualTo: 'Fixed Price')
+        .orderBy('createdAt', descending: true);
+  }
+
+  Future<String> downloadAllUserURLs(String uid, String image) async {
+    return await firebase_storage.FirebaseStorage.instance
+        .ref('property/$uid')
+        .child(image)
+        .getDownloadURL()
+        .catchError((onError) {
+      print('On FirebaseStorage Exception $onError');
+    });
   }
 }
