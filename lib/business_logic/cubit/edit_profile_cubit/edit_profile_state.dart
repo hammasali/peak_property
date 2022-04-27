@@ -20,4 +20,8 @@ class EditProfileUnSuccess extends EditProfileState {
   EditProfileUnSuccess(this.message);
 }
 
+class UserProfileSuccessState extends EditProfileState {
+  final UserInfoModel model ;
 
+  UserProfileSuccessState(this.model);
+}

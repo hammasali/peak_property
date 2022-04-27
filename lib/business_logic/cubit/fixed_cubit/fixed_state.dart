@@ -8,9 +8,9 @@ class FixedInitial extends FixedState {}
 class FixedLoading extends FixedState {}
 
 class FixedSuccess extends FixedState {
-  final List<UploadModel> uploadModel;
+  final List<UploadModel> homes, plot, commercial;
 
-  FixedSuccess(this.uploadModel);
+  FixedSuccess(this.homes, this.plot, this.commercial);
 }
 
 class FixedUnSuccess extends FixedState {
@@ -18,3 +18,4 @@ class FixedUnSuccess extends FixedState {
 
   FixedUnSuccess({this.msg});
 }
+

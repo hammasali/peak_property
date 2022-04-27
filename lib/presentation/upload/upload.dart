@@ -1110,8 +1110,8 @@ class _UploadState extends State<Upload> {
                   startPrice: startController.text,
                   areaRange: areaController.text,
                   areaType: _selectedAreaUnit,
-                  bathrooms: noOfBath,
-                  bedrooms: noOfBeds,
+                  bathrooms: _propertyCategory == 'Homes' ? noOfBath : '0',
+                  bedrooms: _propertyCategory == 'Homes'? noOfBeds : '0',
                   pickedFile: _pickedFile));
             } else {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

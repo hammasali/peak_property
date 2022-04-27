@@ -13,6 +13,7 @@ import 'package:peak_property/presentation/home/bid/bid_detail.dart';
 import 'package:peak_property/presentation/home/bid/place_bid.dart';
 import 'package:peak_property/presentation/home/fixed/fixed_detail.dart';
 import 'package:peak_property/presentation/upload/upload.dart';
+import 'package:peak_property/services/models/upload_model.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -73,7 +74,7 @@ class RouteNavigator extends StatelessWidget {
 
             case Routes.fixedDetails:
               builder = (BuildContext _) =>
-                  FixedDetailScreen(hero: settings.arguments as String);
+                  FixedDetailScreen(model: settings.arguments as UploadModel);
               break;
 
             case Routes.bidDetails:

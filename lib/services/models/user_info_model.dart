@@ -1,7 +1,7 @@
 import 'package:image_picker/image_picker.dart';
 
 class UserInfoModel {
-  String? name, email, createdAt, phoneNo, username, aboutUser;
+  String? name, email, createdAt, phoneNo, username, aboutUser, image;
   XFile? profilePhoto;
 
   UserInfoModel(
@@ -11,6 +11,7 @@ class UserInfoModel {
       this.phoneNo,
       this.username,
       this.aboutUser,
+      this.image,
       this.profilePhoto});
 
   Map<String, dynamic> toMap() {
@@ -23,6 +24,7 @@ class UserInfoModel {
       'aboutUser': aboutUser,
     };
   }
+
   Map<String, dynamic> toMapUpdateProfile() {
     return {
       'name': name,
@@ -31,7 +33,8 @@ class UserInfoModel {
       'aboutUser': aboutUser,
     };
   }
-  factory UserInfoModel.fromMap(Map<String, dynamic> map) {
+
+  factory UserInfoModel.fromMap(Map<String, dynamic> map,[String? image]) {
     return UserInfoModel(
       name: map['name'] as String,
       email: map['email'] as String,
@@ -39,7 +42,7 @@ class UserInfoModel {
       phoneNo: map['phoneNo'] as String,
       username: map['username'] as String,
       aboutUser: map['aboutUser'] as String,
-      profilePhoto: map['profilePhoto'] as XFile,
+      image: image as String,
     );
   }
 }

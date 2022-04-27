@@ -13,19 +13,35 @@ class FixedCubit extends Cubit<FixedState> {
   void fetchProperties() async {
     try {
       emit(FixedLoading());
-      List<UploadModel> upload = [];
+      List<UploadModel> homes = [];
+      List<UploadModel> plot = [];
+      List<UploadModel> commercial = [];
+
       final QuerySnapshot properties =
           await FirebaseRepo.instance.getFixedHomes().get();
+
       for (var e in properties.docs) {
         final String url = await FirebaseRepo.instance
             .downloadAllUserURLs(e.get('uid'), e.get('pickedFilesName')[0]);
-        upload.add(UploadModel.fromMap(e.data() as Map<String, dynamic>, url));
+
+        if (e.get('category') == 'Homes') {
+          homes.add(
+              UploadModel.fromMap(e.data() as Map<String, dynamic>, url, e.id));
+        } else if (e.get('category') == 'Plots') {
+          plot.add(
+              UploadModel.fromMap(e.data() as Map<String, dynamic>, url, e.id));
+        } else {
+          commercial.add(
+              UploadModel.fromMap(e.data() as Map<String, dynamic>, url, e.id));
+        }
       }
-      emit(FixedSuccess(upload));
+      emit(FixedSuccess(homes, plot, commercial));
     } on FirebaseException catch (e) {
       emit(FixedUnSuccess(msg: 'Unexpected Error'));
     } catch (e) {
       emit(FixedUnSuccess(msg: 'Unexpected Error'));
     }
   }
+
+
 }

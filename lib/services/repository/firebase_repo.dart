@@ -43,6 +43,15 @@ class FirebaseRepo {
   Future<void> uploadPropertyData(UploadModel model) async =>
       await _firebaseMethod.uploadPropertyData(model);
 
+  Future<void> addBookmark(UploadModel model) async =>
+      await _firebaseMethod.addBookmark(model);
+
+  Future<void> removeBookmark(var uid) async =>
+      await _firebaseMethod.removeBookmark(uid);
+
+  Future<bool> getBookmark(var uid) async =>
+      await _firebaseMethod.getBookmark(uid);
+
   Future<void> updateProfile(UserInfoModel model) async =>
       await _firebaseMethod.updateProfile(model);
 
@@ -50,4 +59,10 @@ class FirebaseRepo {
 
   Future<String> downloadAllUserURLs(String uid, String image) async =>
       _firebaseMethod.downloadAllUserURLs(uid, image);
+
+  DocumentReference getUserProfile(String uid) =>
+      _firebaseMethod.getUserProfile(uid);
+
+  Future<String> getUserProfilePic(String uid) async =>
+      _firebaseMethod.getUserProfilePic(uid);
 }

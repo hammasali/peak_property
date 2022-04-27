@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:peak_property/business_logic/cubit/fixed_cubit/fixed_cubit.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/core/routes.dart';
 import 'package:peak_property/custom/custom_fixed.dart';
+import 'package:peak_property/services/models/upload_model.dart';
 
 class Fixed extends StatefulWidget {
   const Fixed({Key? key}) : super(key: key);
@@ -37,11 +37,11 @@ class _FixedState extends State<Fixed> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       customType('Homes', context),
-                      customList(state),
+                      customList(state.homes),
                       customType('Plots', context),
-                      customList(state),
+                      customList(state.plot),
                       customType('Commercials', context),
-                      customList(state),
+                      customList(state.commercial),
                       const SizedBox(height: 80),
                     ],
                   );
@@ -55,13 +55,6 @@ class _FixedState extends State<Fixed> {
                       SnackBar(content: Text(state.msg.toString())));
                 }
               }),
-          // Center(
-          //   child: ElevatedButton(
-          //       onPressed: () {
-          //         BlocProvider.of<FixedCubit>(context).fetchProperties();
-          //       },
-          //       child: const Text('Testing')),
-          // )
         ],
       ),
     );
@@ -78,18 +71,41 @@ class _FixedState extends State<Fixed> {
         ),
       );
 
-  customList(FixedSuccess state) => SizedBox(
+  customList(List<UploadModel> model) => SizedBox(
         height: 300.0,
         child: ListView.builder(
           physics: const BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
-          itemCount: state.uploadModel.length,
+          itemCount: model.isEmpty ? 1 : model.length,
           itemBuilder: (BuildContext context, int index) {
-            final value = state.uploadModel[index];
+            if (model.isEmpty) {
+              return Padding(
+                padding:  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width/4),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Image(
+                        image: AssetImage('assets/cloud.png'),
+                        height: 50,
+                        width: 50,
+                      ),
+                      Text(
+                        'Not Available at this moment',
+                        style: Theme.of(context).textTheme.bodyText1,
+                      )
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            final value = model[index];
+
             return GestureDetector(
               onTap: () {
                 Navigator.of(context)
-                    .pushNamed(Routes.fixedDetails, arguments: value.thumbnail);
+                    .pushNamed(Routes.fixedDetails, arguments: value);
               },
               child: CustomFixed(
                   image: value.thumbnail.toString(),

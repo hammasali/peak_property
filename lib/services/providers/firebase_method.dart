@@ -119,4 +119,38 @@ class FirebaseMethod {
       print('On FirebaseStorage Exception $onError');
     });
   }
+
+  DocumentReference getUserProfile(String uid) =>
+      _firestore.collection('users').doc(uid);
+
+  Future<String> getUserProfilePic(String uid) async =>
+      await firebase_storage.FirebaseStorage.instance
+          .ref('profile/${getCurrentUser()!.uid}')
+          .getDownloadURL();
+
+  ///  ----------- BOOKMARK ------------
+
+  Future<void> addBookmark(UploadModel model) async => await _firestore
+      .collection('users')
+      .doc(getCurrentUser()!.uid)
+      .collection('bookmarks')
+      .doc(model.docId)
+      .set(model.toMap());
+
+  Future<void> removeBookmark(var uid) async => await _firestore
+      .collection('users')
+      .doc(getCurrentUser()!.uid)
+      .collection('bookmarks')
+      .doc(uid)
+      .delete();
+
+  Future<bool> getBookmark(var uid) async {
+    var val = await _firestore
+        .collection('users')
+        .doc(getCurrentUser()!.uid)
+        .collection('bookmarks')
+        .doc(uid)
+        .get();
+    return val.exists ? true : false;
+  }
 }

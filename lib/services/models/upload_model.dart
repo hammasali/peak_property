@@ -20,6 +20,7 @@ class UploadModel {
   String? bathrooms;
   String? createdAt;
   String? uid;
+  String? docId;
   String? thumbnail;
   List<dynamic>? pickedFilesName;
   List<XFile>? pickedFile;
@@ -44,7 +45,8 @@ class UploadModel {
       this.pickedFilesName,
       this.uid,
       this.thumbnail,
-      this.pickedFile});
+      this.pickedFile,
+      this.docId});
 
   Map<String, dynamic> toMap() {
     return {
@@ -69,28 +71,30 @@ class UploadModel {
     };
   }
 
-  factory UploadModel.fromMap(Map<String, dynamic> map, [String? imageUrl]) {
+  factory UploadModel.fromMap(Map<String, dynamic> map,
+      [String? imageUrl, String? docId]) {
     return UploadModel(
-      state: map['state'] as String,
-      city: map['city'] as String,
-      uid: map['uid'] as String,
-      address: map['address'] as String,
-      preference: map['preference'] as String,
-      title: map['title'] as String,
-      description: map['description'] as String,
-      category: map['category'] as String,
-      type: map['type'] as String,
-      startPrice: map['startPrice'] as String,
-      endPrice: map['endPrice'] as String,
-      timeRange: map['timeRange'] as double,
-      areaRange: map['areaRange'] as String,
-      areaType: map['areaType'] as String,
-      bedrooms: map['bedrooms'] as String,
-      bathrooms: map['bathrooms'] as String,
-      createdAt: map['createdAt'] as String,
-      pickedFilesName: map['pickedFilesName'],
-      thumbnail: imageUrl
-      // pickedFile: map['pickedFile'] as List<XFile>,
-    );
+        state: map['state'] as String,
+        city: map['city'] as String,
+        uid: map['uid'] as String,
+        address: map['address'] as String,
+        preference: map['preference'] as String,
+        title: map['title'] as String,
+        description: map['description'] as String,
+        category: map['category'] as String,
+        type: map['type'] as String,
+        startPrice: map['startPrice'] as String,
+        endPrice: map['endPrice'] as String,
+        timeRange: map['timeRange'] as double,
+        areaRange: map['areaRange'] as String,
+        areaType: map['areaType'] as String,
+        bedrooms: map['bedrooms'] as String,
+        bathrooms: map['bathrooms'] as String,
+        createdAt: map['createdAt'] as String,
+        pickedFilesName: map['pickedFilesName'],
+        thumbnail: imageUrl,
+        docId: docId
+        // pickedFile: map['pickedFile'] as List<XFile>,
+        );
   }
 }

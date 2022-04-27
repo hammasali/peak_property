@@ -32,4 +32,12 @@ class EditProfileCubit extends Cubit<EditProfileState> {
       emit(EditProfileUnSuccess(e.toString()));
     }
   }
+
+  void getUserProfile(String uid) async {
+    await FirebaseRepo.instance.getUserProfile(uid).get().then((value) async {
+      emit(UserProfileSuccessState(UserInfoModel.fromMap(
+          value.data() as Map<String, dynamic>,
+          await FirebaseRepo.instance.getUserProfilePic(uid))));
+    });
+  }
 }
