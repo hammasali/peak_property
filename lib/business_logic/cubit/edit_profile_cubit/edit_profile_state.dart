@@ -7,7 +7,6 @@ class EditProfileInitial extends EditProfileState {}
 
 class EditProfileLoading extends EditProfileState {}
 
-
 class EditProfileSuccess extends EditProfileState {
   final UserInfoModel userInfoModel;
 
@@ -21,7 +20,8 @@ class EditProfileUnSuccess extends EditProfileState {
 }
 
 class UserProfileSuccessState extends EditProfileState {
-  final UserInfoModel model ;
+  final UserInfoModel? userInfoModel;
+  final List<UploadModel>? uploadModel;
 
-  UserProfileSuccessState(this.model);
+  UserProfileSuccessState({this.userInfoModel, this.uploadModel});
 }

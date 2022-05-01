@@ -13,6 +13,7 @@ part 'upload_state.dart';
 
 class UploadBloc extends Bloc<UploadEvent, UploadState> {
   UploadBloc() : super(UploadInitial()) {
+
     on<PriceRangeEvent>(
         (event, emit) => emit(PriceRangeState(event.start, event.end)));
     on<TimeFrameEvent>((event, emit) => emit(TimeframeState(event.val)));

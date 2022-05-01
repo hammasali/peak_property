@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:peak_property/business_logic/cubit/fixed_cubit/fixed_cubit.dart';
@@ -22,40 +24,45 @@ class _FixedState extends State<Fixed> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 80),
-          BlocConsumer<FixedCubit, FixedState>(
-              bloc: BlocProvider.of<FixedCubit>(context),
-              builder: (context, state) {
-                if (state is FixedLoading) {
-                  return Center(child: getCircularProgress());
-                } else if (state is FixedSuccess) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      customType('Homes', context),
-                      customList(state.homes),
-                      customType('Plots', context),
-                      customList(state.plot),
-                      customType('Commercials', context),
-                      customList(state.commercial),
-                      const SizedBox(height: 80),
-                    ],
-                  );
-                } else {
-                  return const Text('Something went wrong');
-                }
-              },
-              listener: (context, state) {
-                if (state is FixedUnSuccess) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.msg.toString())));
-                }
-              }),
-        ],
+    return RefreshIndicator(
+      color: Colors.black,
+      displacement: 60,
+      onRefresh: _onRefresh,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 80),
+            BlocConsumer<FixedCubit, FixedState>(
+                bloc: BlocProvider.of<FixedCubit>(context),
+                builder: (context, state) {
+                  if (state is FixedLoading) {
+                    return Center(child: getCircularProgress());
+                  } else if (state is FixedSuccess) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        customType('Homes', context),
+                        customList(state.homes),
+                        customType('Plots', context),
+                        customList(state.plot),
+                        customType('Commercials', context),
+                        customList(state.commercial),
+                        const SizedBox(height: 80),
+                      ],
+                    );
+                  } else {
+                    return const Text('Something went wrong');
+                  }
+                },
+                listener: (context, state) {
+                  if (state is FixedUnSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(state.msg.toString())));
+                  }
+                }),
+          ],
+        ),
       ),
     );
   }
@@ -117,4 +124,13 @@ class _FixedState extends State<Fixed> {
           },
         ),
       );
+
+  Future<void> _onRefresh() {
+    Completer<void> completer = Completer<void>();
+     Timer(const Duration(seconds: 3), () {
+      BlocProvider.of<FixedCubit>(context).fetchProperties();
+      completer.complete();
+    });
+    return completer.future;
+  }
 }

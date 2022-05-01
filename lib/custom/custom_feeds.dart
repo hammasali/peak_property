@@ -1,21 +1,24 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:peak_property/services/models/upload_model.dart';
 
 class CustomFeeds extends StatelessWidget {
-  final String title, subtitle, description, time, image, hero;
-  final onTap;
+  final String title, subtitle, description, time, image;
+  final onTap, onBookmarktap;
   final bool bookmark;
+  final UploadModel? model;
 
-  const CustomFeeds(
+  CustomFeeds(
       {Key? key,
       required this.title,
       required this.subtitle,
       required this.description,
-      required this.time,
       required this.image,
-      required this.hero,
+      required this.time,
       required this.bookmark,
-      this.onTap})
+      this.model,
+      this.onTap,
+      this.onBookmarktap})
       : super(key: key);
 
   @override
@@ -30,8 +33,8 @@ class CustomFeeds extends StatelessWidget {
             ///   =========== LEADING ============
             Expanded(
               child: Hero(
-                tag: hero,
-                child: Image.asset(
+                tag: image,
+                child: Image.network(
                   image,
                   fit: BoxFit.cover,
                   width: 150,
@@ -88,7 +91,16 @@ class CustomFeeds extends StatelessWidget {
 
             ///   =========== TIME ===============
             bookmark
-                ? IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark))
+                ? Container(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.6)),
+                    child: IconButton(
+                        iconSize: 30.0,
+                        color: Colors.black,
+                        onPressed: onBookmarktap,
+                        icon: const Icon(Icons.bookmark)),
+                  )
                 : FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(

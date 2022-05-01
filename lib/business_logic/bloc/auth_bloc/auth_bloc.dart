@@ -10,6 +10,7 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(AuthInitial()) {
+
     try {
       on<AuthAppStartedEvent>((event, emit) async {
         var isSignIn = await FirebaseRepo.instance.authSignIn();

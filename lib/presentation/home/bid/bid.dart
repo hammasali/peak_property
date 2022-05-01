@@ -25,7 +25,6 @@ class Bid extends StatelessWidget {
           description: _data.description,
           time: _data.time,
           image: _data.image,
-          hero: _data.image[index],
           onTap: () {
             Navigator.of(context).pushNamed(Routes.bidDetails);
           },

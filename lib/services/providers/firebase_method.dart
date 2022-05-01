@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_chat/models/peer_user.dart';
-import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:peak_property/services/models/upload_model.dart';
@@ -110,6 +108,15 @@ class FirebaseMethod {
         .orderBy('createdAt', descending: true);
   }
 
+  Query getCurrentUserFixedHomes() {
+    return _firestore
+        .collection('users')
+        .doc(getCurrentUser()?.uid)
+        .collection('properties')
+        .where('preference', isEqualTo: 'Fixed Price')
+        .orderBy('createdAt', descending: true);
+  }
+
   Future<String> downloadAllUserURLs(String uid, String image) async {
     return await firebase_storage.FirebaseStorage.instance
         .ref('property/$uid')
@@ -127,6 +134,24 @@ class FirebaseMethod {
       await firebase_storage.FirebaseStorage.instance
           .ref('profile/${getCurrentUser()!.uid}')
           .getDownloadURL();
+
+  /// ============ DELETE ==============
+  Future<void> propertyDelete(UploadModel model) async {
+    await _firestore
+        .collection('users')
+        .doc(getCurrentUser()!.uid)
+        .collection('properties')
+        .doc(model.docId)
+        .delete();
+
+    if (model.pickedFilesName!.isNotEmpty) {
+      await Future.wait(model.pickedFilesName!.map((image) async =>
+          await firebase_storage.FirebaseStorage.instance
+              .ref('property/${getCurrentUser()!.uid}')
+              .child(image)
+              .delete()));
+    }
+  }
 
   ///  ----------- BOOKMARK ------------
 
@@ -153,4 +178,10 @@ class FirebaseMethod {
         .get();
     return val.exists ? true : false;
   }
+
+  Query fetchAllBookmarks() => _firestore
+      .collection('users')
+      .doc(getCurrentUser()?.uid)
+      .collection('bookmarks')
+      .orderBy('createdAt', descending: true);
 }

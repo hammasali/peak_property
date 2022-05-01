@@ -4,7 +4,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:peak_property/services/models/upload_model.dart';
-import 'package:peak_property/services/models/user_info_model.dart';
 import 'package:peak_property/services/repository/firebase_repo.dart';
 
 part 'fixed_detail_state.dart';

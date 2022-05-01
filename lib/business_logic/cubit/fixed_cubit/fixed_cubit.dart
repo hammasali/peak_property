@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:meta/meta.dart';
 import 'package:peak_property/services/models/upload_model.dart';
 import 'package:peak_property/services/repository/firebase_repo.dart';
@@ -42,6 +41,4 @@ class FixedCubit extends Cubit<FixedState> {
       emit(FixedUnSuccess(msg: 'Unexpected Error'));
     }
   }
-
-
 }

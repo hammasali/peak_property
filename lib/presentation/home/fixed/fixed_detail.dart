@@ -3,7 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:peak_property/business_logic/cubit/bookmark_cubit/bookmark_cubit.dart';
+import 'package:peak_property/business_logic/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:peak_property/business_logic/cubit/edit_profile_cubit/edit_profile_cubit.dart';
 import 'package:peak_property/business_logic/cubit/fixed_detail_cubit/fixed_detail_cubit.dart';
 import 'package:peak_property/core/my_app.dart';
@@ -24,7 +24,7 @@ class FixedDetailScreen extends StatelessWidget {
           create: (context) => FixedDetailCubit(),
         ),
         BlocProvider(
-          create: (context) => BookmarkCubit(),
+          create: (context) => BookmarkBloc(),
         ),
       ],
       child: _FixedDetailScreen(model: model),
@@ -61,17 +61,13 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
         children: [
           Stack(
             children: [
-
               ///  ============= Header ================
 
               BlocConsumer<FixedDetailCubit, FixedDetailState>(
                 builder: (context, state) {
                   if (state is FixedDetailLoading) {
                     return SizedBox(
-                        height: MediaQuery
-                            .of(context)
-                            .size
-                            .width,
+                        height: MediaQuery.of(context).size.width,
                         child: Center(child: getCircularProgress()));
                   }
                   if (state is FixedDetailSuccess) {
@@ -82,10 +78,7 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                           enlargeCenterPage: true,
                           autoPlay: true,
                           reverse: true,
-                          height: MediaQuery
-                              .of(context)
-                              .size
-                              .width),
+                          height: MediaQuery.of(context).size.width),
                       itemBuilder: (ctx, index, realIdx) {
                         return Container(
                           decoration: BoxDecoration(
@@ -105,14 +98,8 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                                 image: NetworkImage(
                                   state.url[index],
                                 ),
-                                height: MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width,
-                                width: MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width,
+                                height: MediaQuery.of(context).size.width,
+                                width: MediaQuery.of(context).size.width,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -154,7 +141,7 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                         builder: (context, snapshot) {
                           isBookmarked = snapshot.data ?? false;
 
-                          return BlocBuilder<BookmarkCubit, BookmarkState>(
+                          return BlocBuilder<BookmarkBloc, BookmarkState>(
                             builder: ((context, state) {
                               if (state is BookmarkSuccessState) {
                                 isBookmarked = state.isBookmarked;
@@ -167,9 +154,9 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                                     iconSize: 30.0,
                                     color: Colors.black,
                                     onPressed: () {
-                                      BlocProvider.of<BookmarkCubit>(context)
-                                          .isBookmarked(
-                                          isBookmarked, widget.model);
+                                      BlocProvider.of<BookmarkBloc>(context)
+                                          .add(IsBookmarked(
+                                              isBookmarked, widget.model));
                                     },
                                     icon: Icon(isBookmarked
                                         ? Icons.bookmark_added
@@ -185,10 +172,7 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                 left: 20.0,
                 bottom: 20.0,
                 child: Container(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
+                  width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.6),
                       borderRadius: const BorderRadiusDirectional.only(
@@ -226,8 +210,7 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                             width: 5.0,
                           ),
                           Text(
-                            '${widget.model.city as String}, ${widget.model
-                                .state as String}',
+                            '${widget.model.city as String}, ${widget.model.state as String}',
                             style: const TextStyle(
                                 fontSize: 15.0, color: Colors.black87),
                           ),
@@ -268,8 +251,8 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                           children: [
                             CircleAvatar(
                               radius: 25,
-                              backgroundImage:
-                              NetworkImage(state.model.image as String),
+                              backgroundImage: NetworkImage(
+                                  state.userInfoModel!.image as String),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -279,17 +262,16 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    state.model.name as String,
+                                    state.userInfoModel!.name as String,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   Text(
-                                    state.model.username as String,
-                                    style: Theme
-                                        .of(context)
+                                    state.userInfoModel!.username as String,
+                                    style: Theme.of(context)
                                         .textTheme
                                         .bodyText1!
                                         .copyWith(
-                                        color: Colors.grey, fontSize: 11),
+                                            color: Colors.grey, fontSize: 11),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
@@ -352,7 +334,8 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                   ),
                   CurvedListItem(
                     title: 'PRICE RANGE',
-                    subtitle: '${widget.model.startPrice as String} - ${widget.model.endPrice as String}',
+                    subtitle:
+                        '${widget.model.startPrice as String} - ${widget.model.endPrice as String}',
                     color: Colors.pink,
                     nextColor: Colors.purpleAccent,
                   ),
@@ -362,7 +345,6 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                     color: Colors.purpleAccent,
                     nextColor: Colors.purpleAccent,
                   ),
-
                 ],
               ),
             ),

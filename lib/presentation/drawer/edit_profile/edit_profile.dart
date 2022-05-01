@@ -8,6 +8,7 @@ import 'package:peak_property/business_logic/cubit/edit_profile_cubit/edit_profi
 import 'package:peak_property/business_logic/cubit/image_cubit/image_cubit.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/custom/custom_button.dart';
+import 'package:peak_property/services/repository/firebase_repo.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
@@ -20,10 +21,17 @@ class _EditProfileState extends State<EditProfile> {
   XFile? _pickedFile;
 
   final nameController = TextEditingController();
-  final usernameController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
   final aboutController = TextEditingController();
+  final usernameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<EditProfileCubit>(context)
+        .getUserProfile(FirebaseRepo.instance.getCurrentUser()!.uid);
+  }
 
   @override
   void dispose() {
@@ -68,107 +76,132 @@ class _EditProfileState extends State<EditProfile> {
     return Scaffold(
       appBar: myAppBar,
       body: FadedSlideAnimation(
-        child: Container(
-          color: MyApp.kDefaultBackgroundColorWhite,
-          height: bheight,
-          child: Column(
-            children: [
-              image(),
-              Container(
-                padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),
-                alignment: Alignment.centerLeft,
-                color: Colors.grey[300],
-                width: double.infinity,
-                child: Text(
-                  MyApp.profileInfo,
-                  style: theme.textTheme.headline6!.copyWith(
-                    color: Colors.grey,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              customTextField(
-                  nameController, MyApp.fullNameTxt, TextInputType.name),
-              Divider(
-                color: Colors.grey[300],
-                thickness: 3,
-              ),
-              customTextField(
-                  usernameController, MyApp.username, TextInputType.name),
-              Divider(
-                color: Colors.grey[300],
-                thickness: 3,
-              ),
-              customTextField(
-                  phoneController, MyApp.phoneNo, TextInputType.phone),
-              Divider(
-                color: Colors.grey[300],
-                thickness: 3,
-              ),
-              // customTextField(emailController, MyApp.emailAddress,
-              //     TextInputType.emailAddress),
-              // Divider(
-              //   color: Colors.grey[300],
-              //   thickness: 3,
-              // ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: aboutController,
-                  minLines: 3,
-                  maxLines: 5,
-                  keyboardType: TextInputType.multiline,
-                  decoration: const InputDecoration(
-                    label: Text(MyApp.about),
-                    hintText: MyApp.aboutHint,
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        child: SingleChildScrollView(
+          child: Container(
+            color: MyApp.kDefaultBackgroundColorWhite,
+            height: bheight,
+            child: Column(
+              children: [
+                image(),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),
+                  alignment: Alignment.centerLeft,
+                  color: Colors.grey[300],
+                  width: double.infinity,
+                  child: Text(
+                    MyApp.profileInfo,
+                    style: theme.textTheme.headline6!.copyWith(
+                      color: Colors.grey,
+                      fontSize: 16,
                     ),
                   ),
                 ),
-              ),
+                customTextField(
+                    nameController, MyApp.fullNameTxt, TextInputType.name),
+                Divider(
+                  color: Colors.grey[300],
+                  thickness: 3,
+                ),
+                customTextField(
+                    usernameController, MyApp.username, TextInputType.name),
+                Divider(
+                  color: Colors.grey[300],
+                  thickness: 3,
+                ),
+                customTextField(
+                    phoneController, MyApp.phoneNo, TextInputType.phone),
+                Divider(
+                  color: Colors.grey[300],
+                  thickness: 3,
+                ),
+                // customTextField(emailController, MyApp.emailAddress,
+                //     TextInputType.emailAddress),
+                // Divider(
+                //   color: Colors.grey[300],
+                //   thickness: 3,
+                // ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: aboutController,
+                    minLines: 3,
+                    maxLines: 5,
+                    keyboardType: TextInputType.multiline,
+                    decoration: const InputDecoration(
+                      label: Text(MyApp.about),
+                      hintText: MyApp.aboutHint,
+                      hintStyle: TextStyle(color: Colors.grey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      ),
+                    ),
+                  ),
+                ),
 
-              const Spacer(),
-              /// ======= Button ===============
+                const Spacer(),
 
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                    padding: const EdgeInsets.all(MyApp.kDefaultPadding),
-                    child: BlocConsumer<EditProfileCubit, EditProfileState>(
-                        builder: (context, state) {
-                      if (state is EditProfileLoading) {
-                        return getCircularProgress();
-                      }
-                      return CustomButton(
-                        textColor: MyApp.kDefaultBackgroundColorWhite,
-                        width: MediaQuery.of(context).size.width,
-                        label: MyApp.updateProfile,
-                        onTap: () {
-                          BlocProvider.of<EditProfileCubit>(context)
-                              .updateProfile(
-                                  _pickedFile,
-                                  nameController.text,
-                                  usernameController.text,
-                                  phoneController.text,
-                                  emailController.text,
-                                  aboutController.text);
-                        },
-                      );
-                    }, listener: (context, state) {
-                      if (state is EditProfileSuccess) {
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Upload Successfully.')));
-                      } else if (state is EditProfileUnSuccess) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(state.message.toString())));
-                      }
-                    })),
-              ),
-            ],
+                /// ======= Button ===============
+
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                      padding: const EdgeInsets.all(MyApp.kDefaultPadding),
+                      child: BlocConsumer<EditProfileCubit, EditProfileState>(
+                          builder: (context, state) {
+                        if (state is EditProfileLoading) {
+                          return getCircularProgress();
+                        }
+                        return CustomButton(
+                          textColor: MyApp.kDefaultBackgroundColorWhite,
+                          width: MediaQuery.of(context).size.width,
+                          label: MyApp.updateProfile,
+                          onTap: () {
+                            if (nameController.text.isEmpty ||
+                                usernameController.text.isEmpty ||
+                                phoneController.text.isEmpty ||
+                                emailController.text.isEmpty ||
+                                aboutController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Field Empty.')));
+                            } else {
+                              BlocProvider.of<EditProfileCubit>(context)
+                                  .updateProfile(
+                                      _pickedFile,
+                                      nameController.text,
+                                      usernameController.text,
+                                      phoneController.text,
+                                      emailController.text,
+                                      aboutController.text);
+                            }
+                          },
+                        );
+                      }, listener: (context, state) {
+                        if (state is UserProfileSuccessState) {
+                          nameController.text =
+                              state.userInfoModel!.name.toString();
+                          phoneController.text =
+                              state.userInfoModel!.phoneNo.toString();
+                          emailController.text =
+                              state.userInfoModel!.email.toString();
+                          aboutController.text =
+                              state.userInfoModel!.aboutUser.toString();
+                          usernameController.text =
+                              state.userInfoModel!.username.toString();
+                        }
+                        if (state is EditProfileSuccess) {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Update Successfully.')));
+                        } else if (state is EditProfileUnSuccess) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(state.message.toString())));
+                        }
+                      })),
+                ),
+              ],
+            ),
           ),
         ),
         beginOffset: const Offset(0, 0.3),

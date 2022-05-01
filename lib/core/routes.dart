@@ -1,5 +1,3 @@
-import 'package:camera_capture/camera_capture.dart';
-import 'package:draw_page/draw_page.dart';
 import 'package:flutter/material.dart';
 import 'package:peak_property/auth/login/login_screen.dart';
 import 'package:peak_property/auth/register/register_screen.dart';
