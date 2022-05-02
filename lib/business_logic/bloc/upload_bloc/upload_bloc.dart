@@ -57,6 +57,7 @@ class UploadBloc extends Bloc<UploadEvent, UploadState> {
           createdAt: _createdAt,
           uid: FirebaseRepo.instance.getCurrentUser()!.uid,
           preference: event.preference == 0 ? 'Fixed Price' : 'Bid Price',
+          bidTime: event.bidTime
         );
 
         await FirebaseRepo.instance.uploadPropertyData(uploadModel);

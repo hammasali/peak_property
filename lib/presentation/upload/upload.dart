@@ -598,7 +598,9 @@ class _UploadState extends State<Upload> {
               divisions: timeDivision,
               label: timeframeRange(currentTime.round()),
               onChanged: (value) {
+                print(bidTime);
                 bidTime = timeframeRange(value.round());
+                print(bidTime);
                 BlocProvider.of<UploadBloc>(context)
                     .add(TimeFrameEvent(value.round()));
                 // currentTime = value.roundToDouble();

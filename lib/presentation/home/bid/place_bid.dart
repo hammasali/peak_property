@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:peak_property/business_logic/bloc/bid_bloc/bid_bloc.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/custom/custom_button.dart';
-import 'package:peak_property/dummy.dart';
 import 'package:peak_property/presentation/home/bid/bid_detail.dart';
 import 'package:peak_property/services/models/bider_model.dart';
 import 'package:peak_property/services/repository/firebase_repo.dart';

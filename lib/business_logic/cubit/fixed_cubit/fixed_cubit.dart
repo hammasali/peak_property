@@ -36,7 +36,7 @@ class FixedCubit extends Cubit<FixedState> {
       }
       emit(FixedSuccess(homes, plot, commercial));
     } on FirebaseException catch (e) {
-      emit(FixedUnSuccess(msg: 'Unexpected Error'));
+      emit(FixedUnSuccess(msg: 'Unexpected Error ${e.code}'));
     } catch (e) {
       emit(FixedUnSuccess(msg: 'Unexpected Error'));
     }
