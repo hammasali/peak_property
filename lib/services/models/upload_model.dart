@@ -14,6 +14,7 @@ class UploadModel {
   String? startPrice;
   String? endPrice;
   double? timeRange;
+  String? bidTime;
   String? areaRange;
   String? areaType;
   String? bedrooms;
@@ -37,6 +38,7 @@ class UploadModel {
       this.startPrice,
       this.endPrice,
       this.timeRange,
+      this.bidTime,
       this.areaRange,
       this.areaType,
       this.bedrooms,
@@ -62,6 +64,7 @@ class UploadModel {
       'startPrice': startPrice,
       'endPrice': endPrice,
       'timeRange': timeRange,
+      'bidTime' : bidTime,
       'areaRange': areaRange,
       'areaType': areaType,
       'bedrooms': bedrooms,
@@ -86,6 +89,7 @@ class UploadModel {
         startPrice: map['startPrice'] as String,
         endPrice: map['endPrice'] as String,
         timeRange: map['timeRange'] as double,
+        bidTime: map['bidTime'] as String,
         areaRange: map['areaRange'] as String,
         areaType: map['areaType'] as String,
         bedrooms: map['bedrooms'] as String,

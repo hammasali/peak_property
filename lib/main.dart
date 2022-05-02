@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:peak_property/business_logic/bloc/auth_bloc/auth_bloc.dart';
+import 'package:peak_property/business_logic/bloc/bid_bloc/bid_bloc.dart';
 import 'package:peak_property/business_logic/cubit/edit_profile_cubit/delete_property_cubit.dart';
 import 'package:peak_property/business_logic/cubit/edit_profile_cubit/edit_profile_cubit.dart';
 import 'package:peak_property/business_logic/cubit/fixed_cubit/fixed_cubit.dart';
@@ -47,6 +48,7 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => PropertyTypeCubit()),
         BlocProvider(create: (context) => EditProfileCubit()),
         BlocProvider(create: (context) => FixedCubit()),
+        BlocProvider(create: (context) => BidBloc()),
         // BlocProvider(create: (context) => BookmarkBloc()),
         BlocProvider(create: (context) => DeletePropertyCubit()),
       ],

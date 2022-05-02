@@ -222,7 +222,6 @@ class _ProfileState extends State<_Profile> {
                                   subtitle: _data.description.toString(),
                                   description: _data.address.toString(),
                                   image: _data.thumbnail.toString(),
-                                  model: _data,
                                   onTap: () {
                                     Navigator.of(context).pushNamed(
                                         Routes.fixedDetails,

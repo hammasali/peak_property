@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:peak_property/services/models/bider_model.dart';
 import 'package:peak_property/services/models/upload_model.dart';
 import 'package:peak_property/services/models/user_info_model.dart';
 import 'package:peak_property/services/providers/firebase_method.dart';
@@ -58,6 +59,8 @@ class FirebaseRepo {
 
   Query getFixedHomes() => _firebaseMethod.getFixedHomes();
 
+  Query getBidsProperty() => _firebaseMethod.getBidsProperty();
+
   Query getCurrentUserFixedHomes() =>
       _firebaseMethod.getCurrentUserFixedHomes();
 
@@ -68,8 +71,13 @@ class FirebaseRepo {
       _firebaseMethod.getUserProfile(uid);
 
   Future<String> getUserProfilePic(String uid) async =>
-     await _firebaseMethod.getUserProfilePic(uid);
+      await _firebaseMethod.getUserProfilePic(uid);
 
-  Future<void> propertyDelete(UploadModel model)async =>
-    await  _firebaseMethod.propertyDelete(model);
+  Future<void> propertyDelete(UploadModel model) async =>
+      await _firebaseMethod.propertyDelete(model);
+
+  Future<void> biders(var docId, BidersModel model) async =>
+      await _firebaseMethod.biders(docId, model);
+
+  Query getBiders(var docId) => _firebaseMethod.getBiders(docId);
 }

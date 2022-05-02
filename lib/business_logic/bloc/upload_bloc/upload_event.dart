@@ -52,7 +52,8 @@ class UploadButtonEvent extends UploadEvent {
       areaRange,
       areaType,
       bedrooms,
-      bathrooms;
+      bathrooms,
+      bidTime;
   final int? preference;
   final double? timeRange;
 
@@ -69,6 +70,7 @@ class UploadButtonEvent extends UploadEvent {
       this.startPrice,
       this.endPrice,
       this.timeRange,
+      this.bidTime,
       this.areaRange,
       this.areaType,
       this.bedrooms,

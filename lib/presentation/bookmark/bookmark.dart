@@ -76,7 +76,6 @@ class _BookmarkState extends State<_Bookmark> {
                         },
                         bookmark: true,
                         time: '',
-                        model: _data,
                       );
                     }
 

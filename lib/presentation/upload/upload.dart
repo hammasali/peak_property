@@ -43,6 +43,7 @@ class _UploadState extends State<Upload> {
   double minTime = 1;
   double maxTime = 9;
   int timeDivision = 8;
+  String bidTime = '1 day';
 
   double currentArea = 300;
   double minArea = 0;
@@ -180,20 +181,19 @@ class _UploadState extends State<Upload> {
               const Divider(thickness: 2.0),
               BlocBuilder<PreferenceCubit, int>(
                   builder: (context, state) =>
-                  state == 0 ? priceRange() : timeframe()),
+                      state == 0 ? priceRange() : timeframe()),
               const Divider(thickness: 2.0),
               propertyArea(),
               const Divider(thickness: 2.0),
               BlocBuilder<PropertyTypeCubit, int>(
-                  builder: (context, state) =>
-                  state == 0
+                  builder: (context, state) => state == 0
                       ? Column(
-                    children: [
-                      bedrooms(),
-                      const Divider(thickness: 2.0),
-                      bathrooms()
-                    ],
-                  )
+                          children: [
+                            bedrooms(),
+                            const Divider(thickness: 2.0),
+                            bathrooms()
+                          ],
+                        )
                       : Container()),
               BlocConsumer<UploadBloc, UploadState>(builder: (context, state) {
                 if (state is UploadLoading) {
@@ -244,16 +244,16 @@ class _UploadState extends State<Upload> {
                     if (snapshot.hasError) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(
-                            'Pick image: ${snapshot.error}}',
-                            textAlign: TextAlign.center,
-                          )));
+                        'Pick image: ${snapshot.error}}',
+                        textAlign: TextAlign.center,
+                      )));
                       return _uploadImage();
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           content: Text(
-                            'You have not yet picked an image.',
-                            textAlign: TextAlign.center,
-                          )));
+                        'You have not yet picked an image.',
+                        textAlign: TextAlign.center,
+                      )));
                       return _uploadImage();
                     }
                 }
@@ -518,10 +518,7 @@ class _UploadState extends State<Upload> {
               const SizedBox(
                 width: 10,
               ),
-              Text('TO', style: Theme
-                  .of(context)
-                  .textTheme
-                  .bodyText2),
+              Text('TO', style: Theme.of(context).textTheme.bodyText2),
               const SizedBox(width: 10),
               Expanded(
                 child: TextFormField(
@@ -601,6 +598,7 @@ class _UploadState extends State<Upload> {
               divisions: timeDivision,
               label: timeframeRange(currentTime.round()),
               onChanged: (value) {
+                bidTime = timeframeRange(value.round());
                 BlocProvider.of<UploadBloc>(context)
                     .add(TimeFrameEvent(value.round()));
                 // currentTime = value.roundToDouble();
@@ -640,12 +638,11 @@ class _UploadState extends State<Upload> {
                     itemBuilder: (context) {
                       return _areaUnit
                           .map(
-                            (value) =>
-                            PopupMenuItem(
+                            (value) => PopupMenuItem(
                               value: value,
                               child: Text(value),
                             ),
-                      )
+                          )
                           .toList();
                     },
                     offset: const Offset(1, 40),
@@ -654,7 +651,7 @@ class _UploadState extends State<Upload> {
                       decoration: BoxDecoration(
                           border: Border.all(color: Colors.brown),
                           borderRadius:
-                          const BorderRadius.all(Radius.circular(10))),
+                              const BorderRadius.all(Radius.circular(10))),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -679,7 +676,7 @@ class _UploadState extends State<Upload> {
           height: 80,
           width: 150,
           padding:
-          const EdgeInsets.symmetric(horizontal: MyApp.kDefaultPadding),
+              const EdgeInsets.symmetric(horizontal: MyApp.kDefaultPadding),
           child: Center(
             child: TextFormField(
               controller: areaController,
@@ -713,7 +710,7 @@ class _UploadState extends State<Upload> {
               max: maxArea,
               divisions: 500,
               label:
-              unitArea(currentArea.round().toString(), _selectedAreaUnit),
+                  unitArea(currentArea.round().toString(), _selectedAreaUnit),
               onChanged: (value) {
                 BlocProvider.of<UploadBloc>(context)
                     .add(AreaRangeEvent(value.roundToDouble()));
@@ -810,17 +807,14 @@ class _UploadState extends State<Upload> {
   customText(String text) {
     return Padding(
       padding: const EdgeInsets.all(MyApp.kDefaultPadding),
-      child: Text(text, style: Theme
-          .of(context)
-          .textTheme
-          .headline6),
+      child: Text(text, style: Theme.of(context).textTheme.headline6),
     );
   }
 
   _setStartValue() {
     if (startController.text == '' || endController.text == '') return;
     if (double.parse(startController.text).roundToDouble() <=
-        double.parse(endController.text).roundToDouble() &&
+            double.parse(endController.text).roundToDouble() &&
         double.parse(startController.text).roundToDouble() >= minValue &&
         double.parse(endController.text).roundToDouble() >= minValue &&
         double.parse(startController.text).roundToDouble() <= maxValue &&
@@ -836,7 +830,7 @@ class _UploadState extends State<Upload> {
     if (startController.text == '' || endController.text == '') return;
 
     if (double.parse(startController.text).roundToDouble() <=
-        double.parse(endController.text).roundToDouble() &&
+            double.parse(endController.text).roundToDouble() &&
         double.parse(startController.text).roundToDouble() >= minValue &&
         double.parse(endController.text).roundToDouble() >= minValue &&
         double.parse(startController.text).roundToDouble() <= maxValue &&
@@ -912,10 +906,7 @@ class _UploadState extends State<Upload> {
               BlocProvider.of<PreferenceCubit>(context).onPreferenceEvent(val),
           title: Text(
             title!,
-            style: Theme
-                .of(context)
-                .textTheme
-                .bodyText1,
+            style: Theme.of(context).textTheme.bodyText1,
           ),
           subtitle: Text(value == 0
               ? 'Where you can set price range of your property and negotiate with dealer'
@@ -964,7 +955,8 @@ class _UploadState extends State<Upload> {
                     key: UniqueKey(),
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       mainAxisSpacing: 5,
                       crossAxisSpacing: 5,
@@ -1021,9 +1013,9 @@ class _UploadState extends State<Upload> {
           if (state is ImageUnSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
-                  'Image error: ${state.message}',
-                  textAlign: TextAlign.center,
-                )));
+              'Image error: ${state.message}',
+              textAlign: TextAlign.center,
+            )));
             state.message = null;
           }
         });
@@ -1039,9 +1031,7 @@ class _UploadState extends State<Upload> {
             width: 100,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20.0),
-                border: Border.all(color: Theme
-                    .of(context)
-                    .primaryColor)),
+                border: Border.all(color: Theme.of(context).primaryColor)),
             child: const Icon(
               Icons.add_business,
               color: Colors.grey,
@@ -1103,54 +1093,54 @@ class _UploadState extends State<Upload> {
     return Padding(
       padding: const EdgeInsets.all(MyApp.kDefaultPadding),
       child: CustomButton(
-          onTap: () {
-            if (_pickedFile != null) {
-              if (stateValue != null &&
-                  cityValue != null &&
-                  addressController.text.isNotEmpty) {
-                if (tittleController.text.isNotEmpty &&
-                    descriptionController.text.isNotEmpty) {
-                  BlocProvider.of<UploadBloc>(context).add(UploadButtonEvent(
-                      state: stateValue,
-                      city: cityValue,
-                      address: addressController.text,
-                      preference: _groupValue,
-                      description: descriptionController.text.trim(),
-                      title: tittleController.text.trim(),
-                      type: propertyTypeVariable,
-                      category: _propertyCategory,
-                      endPrice: endController.text,
-                      timeRange: currentTime,
-                      startPrice: startController.text,
-                      areaRange: areaController.text,
-                      areaType: _selectedAreaUnit,
-                      bathrooms: _propertyCategory == 'Homes' ? noOfBath : '0',
-                      bedrooms: _propertyCategory == 'Homes' ? noOfBeds : '0',
-                      pickedFile: _pickedFile));
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text(
-                          'Provide Complete Information Of Property!!')));
-                }
+        onTap: () {
+          if (_pickedFile != null) {
+            if (stateValue != null &&
+                cityValue != null &&
+                addressController.text.isNotEmpty) {
+              if (tittleController.text.isNotEmpty &&
+                  descriptionController.text.isNotEmpty) {
+                BlocProvider.of<UploadBloc>(context).add(UploadButtonEvent(
+                    state: stateValue,
+                    city: cityValue,
+                    address: addressController.text,
+                    preference: _groupValue,
+                    description: descriptionController.text.trim(),
+                    title: tittleController.text.trim(),
+                    type: propertyTypeVariable,
+                    category: _propertyCategory,
+                    endPrice: endController.text,
+                    timeRange: currentTime,
+                    bidTime: bidTime,
+                    startPrice: startController.text,
+                    areaRange: areaController.text,
+                    areaType: _selectedAreaUnit,
+                    bathrooms: _propertyCategory == 'Homes' ? noOfBath : '0',
+                    bedrooms: _propertyCategory == 'Homes' ? noOfBeds : '0',
+                    pickedFile: _pickedFile));
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Provide Complete Location!!')));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content:
+                        Text('Provide Complete Information Of Property!!')));
               }
-            }else {
+            } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Provide Picture of Property or Location!!')));
+                  const SnackBar(content: Text('Provide Complete Location!!')));
             }
-          },
-      label: 'Upload',
-      width: double.infinity,
-      icon: const Icon(
-        Icons.cloud_upload,
-        color: Colors.white,
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Provide Picture of Property or Location!!')));
+          }
+        },
+        label: 'Upload',
+        width: double.infinity,
+        icon: const Icon(
+          Icons.cloud_upload,
+          color: Colors.white,
+        ),
+        textColor: Colors.white,
       ),
-      textColor: Colors.white,
-    ),);
+    );
   }
 }
 
@@ -1183,8 +1173,7 @@ class _CustomChipState extends State<CustomChip> {
           children: List.generate(widget.title.length, (index) {
             return ChoiceChip(
               labelPadding: const EdgeInsets.all(2.0),
-              labelStyle: Theme
-                  .of(context)
+              labelStyle: Theme.of(context)
                   .textTheme
                   .bodyText2!
                   .copyWith(color: const Color(0xff807d7d), fontSize: 14),
@@ -1200,13 +1189,13 @@ class _CustomChipState extends State<CustomChip> {
                 setState(() {
                   defaultChoiceIndex = value ? index : defaultChoiceIndex;
                   propertyTypeVariable =
-                  widget.title[defaultChoiceIndex as int];
+                      widget.title[defaultChoiceIndex as int];
                 });
               },
               // backgroundColor: color,
               elevation: 1,
               padding:
-              const EdgeInsets.symmetric(horizontal: MyApp.kDefaultPadding),
+                  const EdgeInsets.symmetric(horizontal: MyApp.kDefaultPadding),
             );
           }),
         ),

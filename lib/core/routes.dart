@@ -76,11 +76,13 @@ class RouteNavigator extends StatelessWidget {
               break;
 
             case Routes.bidDetails:
-              builder = (BuildContext _) => const BidDetails();
+              builder = (BuildContext _) =>
+                  BidDetails(model: settings.arguments as UploadModel);
               break;
 
             case Routes.placeBid:
-              builder = (BuildContext _) => PlaceBidScreen();
+              builder = (BuildContext _) =>
+                  PlaceBidScreen(args: settings.arguments as BidArgs);
               break;
 
             case Routes.conversationScreen:

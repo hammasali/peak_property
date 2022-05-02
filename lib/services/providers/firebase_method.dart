@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:peak_property/services/models/bider_model.dart';
 import 'package:peak_property/services/models/upload_model.dart';
 import 'package:peak_property/services/models/user_info_model.dart';
 
@@ -84,6 +85,14 @@ class FirebaseMethod {
     }
   }
 
+  Future<void> biders(var docId, BidersModel model) async => await _firestore
+      .collection('users')
+      .doc(getCurrentUser()!.uid)
+      .collection('properties')
+      .doc(docId)
+      .collection('biders')
+      .add(model.toMap());
+
   ///  =========  Database  Update ========== ///
 
   Future<void> updateProfile(UserInfoModel model) async {
@@ -134,6 +143,21 @@ class FirebaseMethod {
       await firebase_storage.FirebaseStorage.instance
           .ref('profile/${getCurrentUser()!.uid}')
           .getDownloadURL();
+
+  Query getBidsProperty() {
+    return _firestore
+        .collectionGroup('properties')
+        .where('preference', isEqualTo: 'Bid Price')
+        .orderBy('createdAt', descending: true);
+  }
+
+  Query getBiders(var docId) => _firestore
+      .collection('users')
+      .doc(getCurrentUser()!.uid)
+      .collection('properties')
+      .doc(docId)
+      .collection('biders')
+      .orderBy('createdAt', descending: true);
 
   /// ============ DELETE ==============
   Future<void> propertyDelete(UploadModel model) async {

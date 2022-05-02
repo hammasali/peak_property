@@ -2,11 +2,13 @@ import 'package:animation_wrappers/animation_wrappers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:peak_property/business_logic/cubit/edit_profile_cubit/edit_profile_cubit.dart';
 import 'package:peak_property/business_logic/cubit/logout_cubit/logout_cubit.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/core/routes.dart';
 import 'package:peak_property/custom/custom_button.dart';
 import 'package:peak_property/presentation/drawer/logout/logout_screen.dart';
+import 'package:peak_property/services/repository/firebase_repo.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({Key? key}) : super(key: key);
@@ -41,6 +43,14 @@ class DrawerScreen extends StatefulWidget {
 
 class _DrawerScreenState extends State<DrawerScreen> {
   @override
+  void initState() {
+    super.initState();
+
+    BlocProvider.of<EditProfileCubit>(context)
+        .getUserProfile(FirebaseRepo.instance.getCurrentUser()!.uid);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
@@ -71,24 +81,37 @@ class _DrawerScreenState extends State<DrawerScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      FadedScaleAnimation(
-                        child: const CircleAvatar(
-                          radius: 35,
-                          backgroundImage: AssetImage('assets/Layer1677.png'),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Hey',
-                        style: theme.textTheme.subtitle2!.copyWith(
-                          color: theme.hintColor,
-                        ),
-                      ),
-                      Text(
-                        'Saman Smith',
-                        style: theme.textTheme.subtitle2!.copyWith(
-                          color: theme.hintColor,
-                        ),
+                      BlocBuilder<EditProfileCubit, EditProfileState>(
+                        builder: (context, state) {
+                          if (state is UserProfileSuccessState) {
+                            return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  FadedScaleAnimation(
+                                    child: CircleAvatar(
+                                      radius: 35,
+                                      backgroundImage: NetworkImage(
+                                          state.userInfoModel!.image as String),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    'Hey',
+                                    style: theme.textTheme.subtitle2!.copyWith(
+                                      color: theme.hintColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    state.userInfoModel!.name as String,
+                                    style: theme.textTheme.subtitle2!.copyWith(
+                                      color: theme.hintColor,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ]);
+                          }
+                          return const Text("Loading...");
+                        },
                       ),
                       const SizedBox(
                         height: 50.0,
@@ -124,7 +147,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                           context: context,
                           title: MyApp.aboutUs,
                           function: () {
-                             aboutUs();
+                            aboutUs();
                           }),
                     ],
                   ),
