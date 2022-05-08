@@ -47,7 +47,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
     super.initState();
 
     BlocProvider.of<EditProfileCubit>(context)
-        .getUserProfile(FirebaseRepo.instance.getCurrentUser()!.uid);
+        .getUserProfile(FirebaseRepo.instance.getCurrentUser()?.uid??'');
   }
 
   @override

@@ -1,12 +1,19 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:intl/intl.dart';
 import 'package:peak_property/services/models/bider_model.dart';
+import 'package:peak_property/services/models/chat_model.dart';
 import 'package:peak_property/services/models/upload_model.dart';
 import 'package:peak_property/services/models/user_info_model.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:uri_to_file/uri_to_file.dart';
 
 class FirebaseMethod {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -63,10 +70,37 @@ class FirebaseMethod {
 
   ///  =========  Database  Add ========== ///
 
-  Future<void> addNewUserData(var model) async => await _firestore
-      .collection('users')
-      .doc(getCurrentUser()!.uid)
-      .set(model);
+  Future<void> addNewUserData(UserInfoModel model) async {
+    await _firestore
+        .collection('users')
+        .doc(getCurrentUser()!.uid)
+        .set(model.toMap());
+
+    if (model.profilePhoto != null) {
+      await firebase_storage.FirebaseStorage.instance
+          .ref('profile/${getCurrentUser()!.uid}')
+          .putFile(File(model.profilePhoto!.path));
+    }
+
+    //GOOGLE SIGN UP
+    if (model.image != null) {
+      var status = await Permission.storage.request();
+      if (status.isGranted) {
+        var response = await Dio().get(model.image as String,
+            options: Options(responseType: ResponseType.bytes));
+        final Map result = await ImageGallerySaver.saveImage(
+            Uint8List.fromList(response.data),
+            quality: 60,
+            name: "profile_photo");
+
+        File file = await toFile(result['filePath']);
+
+        await firebase_storage.FirebaseStorage.instance
+            .ref('profile/${getCurrentUser()!.uid}')
+            .putFile(File(file.path));
+      }
+    }
+  }
 
   Future<void> uploadPropertyData(UploadModel model) async {
     await _firestore
@@ -85,13 +119,14 @@ class FirebaseMethod {
     }
   }
 
-  Future<void> biders(var docId, BidersModel model) async => await _firestore
-      .collection('users')
-      .doc(getCurrentUser()!.uid)
-      .collection('properties')
-      .doc(docId)
-      .collection('biders')
-      .add(model.toMap());
+  Future<void> biders(var docId, BidersModel model, var uid) async =>
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('properties')
+          .doc(docId)
+          .collection('biders')
+          .add(model.toMap());
 
   ///  =========  Database  Update ========== ///
 
@@ -141,8 +176,11 @@ class FirebaseMethod {
 
   Future<String> getUserProfilePic(String uid) async =>
       await firebase_storage.FirebaseStorage.instance
-          .ref('profile/${getCurrentUser()!.uid}')
-          .getDownloadURL();
+          .ref('profile/$uid')
+          .getDownloadURL()
+          .catchError((onError) {
+        print('On FirebaseStorage Exception $onError');
+      });
 
   Query getBidsProperty() {
     return _firestore
@@ -151,9 +189,9 @@ class FirebaseMethod {
         .orderBy('createdAt', descending: true);
   }
 
-  Query getBiders(var docId) => _firestore
+  Query getBiders(var docId, var uid) => _firestore
       .collection('users')
-      .doc(getCurrentUser()!.uid)
+      .doc(uid)
       .collection('properties')
       .doc(docId)
       .collection('biders')
@@ -208,4 +246,98 @@ class FirebaseMethod {
       .doc(getCurrentUser()?.uid)
       .collection('bookmarks')
       .orderBy('createdAt', descending: true);
+
+  ///  ----------- MESSAGE ------------
+
+  Future<void> addMessageToDB(
+      String? message,
+      String? receiverId,
+      String? senderName,
+      String? senderImageUrl,
+      String? receiverName,
+      String? receiverImageUrl) async {
+    String _currentUser = getCurrentUser()!.uid;
+    Timestamp _timestamp = Timestamp.now();
+    String _time = DateFormat('h:mm a').format(DateTime.now());
+
+    ChatModel receiverModel = ChatModel(
+        name: receiverName,
+        time: _time,
+        timestamp: _timestamp,
+        message: message,
+        photo: receiverImageUrl,
+        receiverId: receiverId,
+        senderId: _currentUser);
+
+    ChatModel senderModel = ChatModel(
+        name: senderName,
+        time: _time,
+        timestamp: _timestamp,
+        message: message,
+        photo: senderImageUrl,
+        receiverId: receiverId,
+        senderId: _currentUser);
+
+    // ================= ADDING TO CHAT ROOM =================
+    await _firestore
+        .collection('chats')
+        .doc(_currentUser)
+        .collection('chatUsers')
+        .doc(receiverId)
+        .set(receiverModel.toMap())
+        .then((value) => _firestore
+            .collection('chats')
+            .doc(receiverId)
+            .collection('chatUsers')
+            .doc(_currentUser)
+            .set(senderModel.toMap()));
+
+    //  ================  ADDING MESSAGE TO DB  ================
+
+    await _firestore
+        .collection('chats')
+        .doc(_currentUser)
+        .collection(receiverId!)
+        .add(receiverModel.toMap())
+        .then((value) => _firestore
+            .collection('chats')
+            .doc(receiverId)
+            .collection(_currentUser)
+            .add(senderModel.toMap()));
+  }
+
+  Query fetchUserChatRoom() => _firestore
+      .collection('chats')
+      .doc(getCurrentUser()!.uid)
+      .collection('chatUsers')
+      .orderBy('timestamp', descending: true);
+
+  Query fetchUserChat(String? uid) => _firestore
+      .collection('chats')
+      .doc(getCurrentUser()!.uid)
+      .collection(uid!)
+      .orderBy('timestamp', descending: false);
+
+  Future<void> deleteChat(String docId) async {
+    await _firestore
+        .collection('chats')
+        .doc(getCurrentUser()!.uid)
+        .collection('chatUsers')
+        .doc(docId)
+        .delete();
+
+    final collection = await FirebaseFirestore.instance
+        .collection("chats")
+        .doc(getCurrentUser()!.uid)
+        .collection(docId)
+        .get();
+
+    final batch = FirebaseFirestore.instance.batch();
+
+    for (final doc in collection.docs) {
+      batch.delete(doc.reference);
+    }
+
+    return batch.commit();
+  }
 }

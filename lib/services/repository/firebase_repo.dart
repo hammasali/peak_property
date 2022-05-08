@@ -76,8 +76,25 @@ class FirebaseRepo {
   Future<void> propertyDelete(UploadModel model) async =>
       await _firebaseMethod.propertyDelete(model);
 
-  Future<void> biders(var docId, BidersModel model) async =>
-      await _firebaseMethod.biders(docId, model);
+  Future<void> biders(var docId, BidersModel model, var uid) async =>
+      await _firebaseMethod.biders(docId, model, uid);
 
-  Query getBiders(var docId) => _firebaseMethod.getBiders(docId);
+  Query getBiders(var docId, var uid) => _firebaseMethod.getBiders(docId, uid);
+
+  Future<void> addMessageToDB(
+          {String? message,
+          String? receiverId,
+          String? senderName,
+          String? senderImageUrl,
+          String? receiverName,
+          String? receiverImageUrl}) async =>
+      _firebaseMethod.addMessageToDB(message, receiverId, senderName,
+          senderImageUrl, receiverName, receiverImageUrl);
+
+  Query fetchUserChatRoom() => _firebaseMethod.fetchUserChatRoom();
+
+  Query fetchUserChat(String? uid) => _firebaseMethod.fetchUserChat(uid);
+
+  Future<void> deleteChat(String docId) async =>
+      await _firebaseMethod.deleteChat(docId);
 }

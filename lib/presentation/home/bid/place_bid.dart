@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:peak_property/business_logic/bloc/bid_bloc/bid_bloc.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/custom/custom_button.dart';
-import 'package:peak_property/presentation/home/bid/bid_detail.dart';
+import 'package:peak_property/services/models/args.dart';
 import 'package:peak_property/services/models/bider_model.dart';
 import 'package:peak_property/services/repository/firebase_repo.dart';
 
@@ -26,7 +26,9 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
   @override
   void initState() {
     super.initState();
-    _stream = FirebaseRepo.instance.getBiders(widget.args.docId).snapshots();
+    _stream = FirebaseRepo.instance
+        .getBiders(widget.args.docId, widget.args.uid)
+        .snapshots();
   }
 
   @override
@@ -77,11 +79,14 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
               return Center(child: getCircularProgress());
             }
 
-            if (snapshot.hasData) {
+            if (!snapshot.hasData) {
               return Center(
                   child: Text(
                 'No one has bid yet, Place your bid.',
-                style: Theme.of(context).textTheme.headline5?.copyWith(fontSize: 16),
+                style: Theme.of(context)
+                    .textTheme
+                    .headline5
+                    ?.copyWith(fontSize: 16),
               ));
             }
 
@@ -200,10 +205,16 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                       color: MyApp.kDefaultBackgroundColorWhite,
                       textColor: MyApp.kDefaultTextColorBlack,
                       onTap: () {
-                        BlocProvider.of<BidBloc>(context).add(PlaceBid(
-                            amount.text,
-                            widget.args.image as String,
-                            widget.args.docId as String));
+                        if (amount.text.isNotEmpty) {
+                          BlocProvider.of<BidBloc>(context).add(PlaceBid(
+                              amount.text,
+                              widget.args.image as String,
+                              widget.args.docId as String,
+                              widget.args.uid as String));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Place your bid.')));
+                        }
                       },
                     );
                   },

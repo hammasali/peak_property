@@ -12,7 +12,7 @@ class GetBidUrls extends BidEvent {
 }
 
 class PlaceBid extends BidEvent {
-  final String price,image,docId;
+  final String price,image,docId,uid;
 
-  PlaceBid(this.price,this.image,this.docId);
+  PlaceBid(this.price,this.image,this.docId,this.uid);
 }

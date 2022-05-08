@@ -1,18 +1,52 @@
-import 'dart:typed_data';
-
 import 'package:animation_wrappers/animation_wrappers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:peak_property/business_logic/cubit/edit_profile_cubit/edit_profile_cubit.dart';
 import 'package:peak_property/core/my_app.dart';
+import 'package:peak_property/services/models/args.dart';
+import 'package:peak_property/services/models/chat_model.dart';
+import 'package:peak_property/services/repository/firebase_repo.dart';
 
-class ChatSingleScreen extends StatelessWidget {
-  ChatSingleScreen({Key? key}) : super(key: key);
-  final List<String> messages = [
-    "Hello There",
-    "How You Doing ",
-    "Hey Wassup",
-    "Isnt This App Amazing",
-    "Its So Cool That I Can Chat With My Friends"
-  ];
+class ChatSingleScreen extends StatefulWidget {
+  final ChatArgs args;
+
+  const ChatSingleScreen({Key? key, required this.args}) : super(key: key);
+
+  @override
+  State<ChatSingleScreen> createState() => _ChatSingleScreenState();
+}
+
+class _ChatSingleScreenState extends State<ChatSingleScreen> {
+  TextEditingController? _controller;
+  ScrollController? _listController;
+  Query? _fetchChat;
+  var _currentUser;
+  bool? _isWriting;
+  late String senderName;
+  late String senderImageUrl;
+
+  @override
+  void initState() {
+    _fetchChat = FirebaseRepo.instance.fetchUserChat(widget.args.uid);
+    _currentUser = FirebaseRepo.instance.getCurrentUser()!.uid;
+    BlocProvider.of<EditProfileCubit>(context).getUserProfile(_currentUser);
+    _controller = TextEditingController();
+    _listController = ScrollController();
+    _isWriting = false;
+
+    print('UID ${widget.args.uid}');
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller!.dispose();
+    _listController!.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,15 +63,15 @@ class ChatSingleScreen extends StatelessWidget {
               margin: const EdgeInsets.symmetric(vertical: 16),
               decoration: const BoxDecoration(shape: BoxShape.circle),
               child: FadedScaleAnimation(
-                child: const CircleAvatar(
+                child: CircleAvatar(
                   radius: 24,
-                  backgroundImage: AssetImage("assets/Layer1677.png"),
+                  backgroundImage: NetworkImage(widget.args.image),
                 ),
               ),
             ),
             const SizedBox(width: 10),
             Text(
-              "Kevin Taylor",
+              widget.args.name,
               style: theme.textTheme.headline6!.copyWith(
                 fontSize: 16.7,
                 fontWeight: FontWeight.w500,
@@ -58,28 +92,40 @@ class ChatSingleScreen extends StatelessWidget {
       ),
     );
 
-    return Scaffold(
-      appBar: myAppBar,
-      body: FadedSlideAnimation(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.only(top: MyApp.kDefaultPadding),
-                itemCount: 20,
-                itemBuilder: (context, index) {
-                  if (index % 2 == 0) return sender(context, index);
-                  return receiver(context, index);
+    return BlocListener<EditProfileCubit, EditProfileState>(
+      listener: (context, state) {
+        if (state is UserProfileSuccessState) {
+          senderName = state.userInfoModel!.name as String;
+          senderImageUrl = state.userInfoModel!.image as String;
+        }
+      },
+      child: Scaffold(
+        appBar: myAppBar,
+        body: FadedSlideAnimation(
+          child: Column(
+            children: [
+              StreamBuilder<QuerySnapshot>(
+                stream: _fetchChat!.snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: getCircularProgress(),
+                    );
+                  } else if (snapshot.hasError) {
+                    return const Icon(Icons.error_outline);
+                  } else {
+                    return Expanded(child: chats(snapshot.data!.docs));
+                  }
                 },
               ),
-            ),
-            message(context),
-          ],
+              message(context),
+            ],
+          ),
+          beginOffset: const Offset(0, 0.3),
+          endOffset: const Offset(0, 0),
+          slideCurve: Curves.linearToEaseOut,
         ),
-        beginOffset: const Offset(0, 0.3),
-        endOffset: const Offset(0, 0),
-        slideCurve: Curves.linearToEaseOut,
       ),
     );
   }
@@ -104,7 +150,18 @@ class ChatSingleScreen extends StatelessWidget {
           const SizedBox(width: 10),
           SizedBox(
             width: mediaQuery.size.width * 0.7,
-            child:  TextField(
+            child: TextField(
+              controller: _controller,
+              autofocus: false,
+              onChanged: (val) {
+                (val.isNotEmpty && val.trim() != '')
+                    ? setState(() {
+                        _isWriting = true;
+                      })
+                    : setState(() {
+                        _isWriting = false;
+                      });
+              },
               keyboardType: TextInputType.multiline,
               cursorColor: theme.primaryColor,
               decoration: const InputDecoration(
@@ -115,11 +172,38 @@ class ChatSingleScreen extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          Icon(
-            Icons.send,
-            color: theme.primaryColor,
-            size: 22,
-          ),
+          _isWriting == true
+              ? Expanded(
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.send,
+                      color: theme.primaryColor,
+                      size: 22,
+                    ),
+                    onPressed: () {
+                      FirebaseRepo.instance.addMessageToDB(
+                          message: _controller!.text,
+                          receiverId: widget.args.uid,
+                          receiverName: widget.args.name,
+                          receiverImageUrl: widget.args.image,
+                          senderName: senderName,
+                          senderImageUrl: senderImageUrl);
+                      _controller!.text = '';
+                      setState(() {
+                        _isWriting = false;
+                      });
+                    },
+                  ),
+                )
+              : const Expanded(
+                  child: IconButton(
+                      onPressed: null,
+                      icon: Icon(
+                        Icons.send,
+                        color: Colors.grey,
+                        size: 22,
+                      )),
+                ),
           const SizedBox(
             width: 5,
           ),
@@ -128,80 +212,111 @@ class ChatSingleScreen extends StatelessWidget {
     );
   }
 
-  sender(BuildContext context, int index) {
+  sender(BuildContext context, String msg, String time) {
     final theme = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            const Text(
-              "12:00 am",
-              style: TextStyle(color: Colors.grey, fontSize: 8),
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(10, 4, 10, 4),
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Theme.of(context).primaryColor,
+    return FadedScaleAnimation(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                time,
+                style: const TextStyle(color: Colors.grey, fontSize: 8),
               ),
-              // width: mediaQuery.size.width * 0.7,
-              width: messages[index % messages.length].length * 10.0 >=
-                      mediaQuery.size.width * 0.7
-                  ? mediaQuery.size.width * 0.7
-                  : messages[index % messages.length].length * 10.0,
-              alignment: Alignment.centerRight,
-              child: Text(
-                messages[index % messages.length],
-                style: theme.textTheme.bodyText1!
-                    .copyWith(fontSize: 14.7, color: Colors.white),
+              Container(
+                margin: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Theme.of(context).primaryColor,
+                ),
+                // width: mediaQuery.size.width * 0.7,
+                width: mediaQuery.size.width * 0.7,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  msg,
+                  style: theme.textTheme.bodyText1!
+                      .copyWith(fontSize: 14.7, color: Colors.white),
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  receiver(BuildContext context, int index) {
+  receiver(BuildContext context, String msg, String time) {
     final theme = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.fromLTRB(10, 4, 10, 4),
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.grey[400]),
-              // width: mediaQuery.size.width * 0.7,
-              width: messages[index % messages.length].length * 10.0 >=
-                      mediaQuery.size.width * 0.7
-                  ? mediaQuery.size.width * 0.7
-                  : messages[index % messages.length].length * 10.0,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                messages[index % messages.length],
-                style: theme.textTheme.bodyText1!
-                    .copyWith(fontSize: 14.7, color: Colors.black),
+    return FadedScaleAnimation(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey[400]),
+                // width: mediaQuery.size.width * 0.7,
+                width: mediaQuery.size.width * 0.7,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  msg,
+                  style: theme.textTheme.bodyText1!
+                      .copyWith(fontSize: 14.7, color: Colors.black),
+                ),
               ),
-            ),
-            const Text(
-              "12:07 am",
-              style: TextStyle(color: Colors.grey, fontSize: 8),
-            ),
-          ],
-        ),
-      ],
+              Text(
+                time,
+                style: const TextStyle(color: Colors.grey, fontSize: 8),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
+  }
+
+  chats(List<QueryDocumentSnapshot> docs) {
+    if (docs.isEmpty) {
+      return Center(
+          child: Text(
+        'Send Your Greetings :)',
+        style: Theme.of(context)
+            .textTheme
+            .headline6
+            ?.copyWith(letterSpacing: 1.1, fontStyle: FontStyle.normal),
+      ));
+    }
+
+    ///This is to get the bottom of list when new message arrives. It will call
+    ///every time whenever the setState calls / UI change
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
+      _listController!.animateTo(_listController!.position.maxScrollExtent,
+          duration: const Duration(microseconds: 250), curve: Curves.easeInOut);
+    });
+
+    return ListView.builder(
+        controller: _listController,
+        itemCount: docs.length,
+        itemBuilder: (BuildContext context, int index) {
+          var data =
+              ChatModel.fromMap(docs[index].data() as Map<String, dynamic>);
+
+          return data.senderId == _currentUser
+              ? sender(context, data.message.toString(), data.time.toString())
+              : receiver(
+                  context, data.message.toString(), data.time.toString());
+        });
   }
 }
 
@@ -210,6 +325,8 @@ class ChatSingleScreen extends StatelessWidget {
 // import 'dart:typed_data';
 //
 // import 'package:firebase_chat/firebase_chat.dart';
+// import 'package:flutter/material.dart';
+// import 'package:peak_property/core/my_app.dart';
 // import 'package:peak_property/core/routes.dart';
 //
 // class ChatSingleScreen extends StatefulWidget {
@@ -226,10 +343,10 @@ class ChatSingleScreen extends StatelessWidget {
 //   void initState() {
 //     super.initState();
 //     peers = {
-//       'myId': PeerUser(documentId: 'myId', name: 'Grievous'),
+//       'myId': PeerUser(documentId: 'OW3V8T6jd8hCRcctDmspWFDONJh1', name: 'Hammas'),
 //       'otherId': PeerUser(
-//           documentId: 'otherId',
-//           name: 'Kenobi',
+//           documentId: 'OW3V8T6jd8hCRcctDmspWFDONJh1',
+//           name: 'Shahwar',
 //           image:
 //               'https://cdn.vox-cdn.com/thumbor/SRwHbaTMxPr4f8EJdfai_UR2y34=/1400x1050/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/6434955/obi-wan.0.jpg'),
 //     };
@@ -238,7 +355,6 @@ class ChatSingleScreen extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
 //     print('${peers['myId']} : $peers  ${peers['otherId']?.name}');
-//
 //
 //     return Scaffold(
 //         appBar: AppBar(
@@ -251,8 +367,7 @@ class ChatSingleScreen extends StatelessWidget {
 //             path: 'Chats/chatId',
 //             title: peers['otherId']?.name,
 //           ),
-//         )
-//     );
+//         ));
 //   }
 // }
 //
@@ -302,15 +417,12 @@ class ChatSingleScreen extends StatelessWidget {
 //   @override
 //   Future getImage() async {
 //     List<Uint8List>? images;
-//     images = await Navigator.of(context)
-//         .pushNamed(Routes.cameraPage);
+//     images = await Navigator.of(context).pushNamed(Routes.cameraPage);
 //     if (images != null && images.length == 1) {
-//       Uint8List? image = await Navigator.of(context).pushNamed(
-//           Routes.drawPage,
+//       Uint8List? image = await Navigator.of(context).pushNamed(Routes.drawPage,
 //           arguments: DrawPageArgs(images[0], loadingWidget));
 //       if (image == null) return null;
 //       images = [image];
-//       // }
 //     }
 //
 //     if (images != null) {
@@ -383,10 +495,10 @@ class ChatSingleScreen extends StatelessWidget {
 //     );
 //   }
 // }
-
-class DrawPageArgs {
-  Uint8List uint8list;
-  Widget widget;
-
-  DrawPageArgs(this.uint8list, this.widget);
-}
+//
+// class DrawPageArgs {
+//   Uint8List uint8list;
+//   Widget widget;
+//
+//   DrawPageArgs(this.uint8list, this.widget);
+// }

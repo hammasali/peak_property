@@ -1,9 +1,7 @@
-import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:peak_property/services/models/bider_model.dart';
 import 'package:peak_property/services/models/upload_model.dart';
@@ -65,13 +63,12 @@ class BidBloc extends Bloc<BidEvent, BidState> {
       try {
         emit(BidLoading());
 
-        String _createdAt =
-            DateFormat('EEE, MMM d, ' 'yyyy h:mm a').format(DateTime.now());
+        Timestamp _createdAt = Timestamp.now();
 
         BidersModel model = BidersModel(
             image: event.image, price: event.price, createdAt: _createdAt);
 
-        await FirebaseRepo.instance.biders(event.docId, model);
+        await FirebaseRepo.instance.biders(event.docId, model, event.uid);
 
         emit(BidSuccess(model: bids, url: url, bidModel: model));
       } on PlatformException catch (e) {

@@ -175,14 +175,14 @@ class _ProfileState extends State<_Profile> {
                               right: 8.0,
                               bottom: MyApp.kDefaultPadding),
                           child: AutoSizeText(
-                            state.userInfoModel!.aboutUser as String ,
+                            state.userInfoModel!.aboutUser as String,
                             style: theme.textTheme.subtitle1,
                           ),
                         )),
                     const Divider(thickness: 2.0),
 
                     /// ------ FEEDS --------------
-              state.uploadModel!.isEmpty
+                    state.uploadModel!.isEmpty
                         ? Center(
                             child: Text(
                             'Your feeds will be here.. :)',
@@ -272,7 +272,7 @@ class _ProfileState extends State<_Profile> {
               textColor: MyApp.kDefaultTextColorBlack,
               onTap: () => Navigator.of(context).pop(false),
             ),
-            BlocListener<DeletePropertyCubit,DeletePropertyState>(
+            BlocListener<DeletePropertyCubit, DeletePropertyState>(
               listener: (context, state) {
                 if (state is DeletePropertyUnSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(

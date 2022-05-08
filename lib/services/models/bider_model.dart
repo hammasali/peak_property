@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class BidersModel {
-  String? price, image, createdAt;
+  String? price, image;
+  Timestamp? createdAt;
 
   BidersModel({this.price, this.image, this.createdAt});
 
@@ -15,7 +18,6 @@ class BidersModel {
     return BidersModel(
       price: map['price'] as String,
       image: map['image'] as String,
-      createdAt: map['createdAt'] as String,
     );
   }
 }

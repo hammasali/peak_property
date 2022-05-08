@@ -11,6 +11,7 @@ import 'package:peak_property/presentation/home/bid/bid_detail.dart';
 import 'package:peak_property/presentation/home/bid/place_bid.dart';
 import 'package:peak_property/presentation/home/fixed/fixed_detail.dart';
 import 'package:peak_property/presentation/upload/upload.dart';
+import 'package:peak_property/services/models/args.dart';
 import 'package:peak_property/services/models/upload_model.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -86,7 +87,9 @@ class RouteNavigator extends StatelessWidget {
               break;
 
             case Routes.conversationScreen:
-              builder = (BuildContext _) => ChatSingleScreen();
+              builder = (BuildContext _) => ChatSingleScreen(
+                    args: settings.arguments as ChatArgs,
+                  );
               break;
 
             case Routes.profile:

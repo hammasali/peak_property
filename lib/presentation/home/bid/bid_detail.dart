@@ -8,9 +8,9 @@ import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/core/routes.dart';
 import 'package:peak_property/custom/curved.dart';
 import 'package:peak_property/custom/custom_button.dart';
-import 'package:peak_property/dummy.dart';
-import 'package:peak_property/services/models/bider_model.dart';
+import 'package:peak_property/services/models/args.dart';
 import 'package:peak_property/services/models/upload_model.dart';
+import 'package:peak_property/services/repository/firebase_repo.dart';
 
 class BidDetails extends StatefulWidget {
   final UploadModel model;
@@ -26,6 +26,9 @@ class _BidDetailsState extends State<BidDetails>
   int _current = 0;
   final CarouselController _controller = CarouselController();
   String? image;
+  late String? _currentUserImage;
+  String? name;
+  final _currentId = FirebaseRepo.instance.getCurrentUser()?.uid;
 
   @override
   void initState() {
@@ -34,6 +37,8 @@ class _BidDetailsState extends State<BidDetails>
 
     BlocProvider.of<EditProfileCubit>(context)
         .getUserProfile(widget.model.uid.toString());
+
+    _getCurrentUserProfilePic();
   }
 
   @override
@@ -61,6 +66,7 @@ class _BidDetailsState extends State<BidDetails>
               builder: (context, state) {
                 if (state is UserProfileSuccessState) {
                   image = state.userInfoModel!.image;
+                  name = state.userInfoModel!.name;
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -87,13 +93,25 @@ class _BidDetailsState extends State<BidDetails>
             ),
           ),
         ),
-        actions: const [
-          Icon(
-            Icons.chat_rounded,
-            size: MyApp.kDefaultIconSize,
-            color: Colors.black87,
-          ),
-          SizedBox(width: 12.0)
+        actions: [
+          _currentId == widget.model.uid
+              ? Container()
+              : IconButton(
+                  icon: const Icon(
+                    Icons.chat_rounded,
+                    size: MyApp.kDefaultIconSize,
+                    color: Colors.black87,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(Routes.conversationScreen,
+                        arguments: ChatArgs(
+                          name as String,
+                          image as String,
+                          widget.model.uid as String,
+                        ));
+                  },
+                ),
+          const SizedBox(width: 12.0)
         ],
       ),
       body: SingleChildScrollView(
@@ -144,7 +162,6 @@ class _BidDetailsState extends State<BidDetails>
               enlargeCenterPage: true,
               scrollDirection: Axis.horizontal,
               onPageChanged: (index, reason) {
-                //TODO: USe bloc for state management
                 setState(() {
                   _current = index;
                 });
@@ -337,7 +354,8 @@ class _BidDetailsState extends State<BidDetails>
               label: 'Place a bid',
               onTap: () {
                 Navigator.of(context).pushNamed(Routes.placeBid,
-                    arguments: BidArgs(image, widget.model.docId));
+                    arguments:
+                        BidArgs(_currentUserImage, widget.model.docId, widget.model.uid));
               },
             )),
           ),
@@ -345,10 +363,9 @@ class _BidDetailsState extends State<BidDetails>
       ],
     );
   }
-}
 
-class BidArgs {
-  String? image, docId;
-
-  BidArgs(this.image, this.docId);
+  void _getCurrentUserProfilePic() async {
+    _currentUserImage = await FirebaseRepo.instance
+        .getUserProfilePic(FirebaseRepo.instance.getCurrentUser()!.uid);
+  }
 }

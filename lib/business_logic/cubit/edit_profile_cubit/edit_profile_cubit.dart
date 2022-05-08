@@ -36,13 +36,15 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   }
 
   void getUserProfile(String uid) async {
-    await FirebaseRepo.instance.getUserProfile(uid).get().then((value) async {
+    if(uid.isNotEmpty) {
+      await FirebaseRepo.instance.getUserProfile(uid).get().then((value) async {
       emit(UserProfileSuccessState(
           userInfoModel: UserInfoModel.fromMap(
               value.data() as Map<String, dynamic>,
               await FirebaseRepo.instance.getUserProfilePic(uid)),
           uploadModel: model));
     });
+    }
   }
 
   void getCurrentUserProfile() async {

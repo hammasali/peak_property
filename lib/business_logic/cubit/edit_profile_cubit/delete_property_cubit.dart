@@ -23,4 +23,19 @@ class DeletePropertyCubit extends Cubit<DeletePropertyState> {
       emit(DeletePropertyUnSuccess(e.toString()));
     }
   }
+
+  void deleteChat(String docId) async {
+    try {
+      emit(DeletePropertyLoading());
+      await FirebaseRepo.instance.deleteChat(docId);
+      emit(DeletePropertySuccess());
+    } on PlatformException catch (e) {
+      emit(DeletePropertyUnSuccess(e.message.toString()));
+    } on FirebaseException catch (e) {
+      emit(DeletePropertyUnSuccess(e.message.toString()));
+    } catch (e) {
+      emit(DeletePropertyUnSuccess(e.toString()));
+    }
+  }
+
 }

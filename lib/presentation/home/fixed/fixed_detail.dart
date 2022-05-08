@@ -7,7 +7,9 @@ import 'package:peak_property/business_logic/bloc/bookmark_bloc/bookmark_bloc.da
 import 'package:peak_property/business_logic/cubit/edit_profile_cubit/edit_profile_cubit.dart';
 import 'package:peak_property/business_logic/cubit/fixed_detail_cubit/fixed_detail_cubit.dart';
 import 'package:peak_property/core/my_app.dart';
+import 'package:peak_property/core/routes.dart';
 import 'package:peak_property/custom/curved.dart';
+import 'package:peak_property/services/models/args.dart';
 import 'package:peak_property/services/models/upload_model.dart';
 import 'package:peak_property/services/repository/firebase_repo.dart';
 
@@ -43,6 +45,7 @@ class _FixedDetailScreen extends StatefulWidget {
 
 class _FixedDetailScreenState extends State<_FixedDetailScreen> {
   bool isBookmarked = false;
+  final _currentId = FirebaseRepo.instance.getCurrentUser()?.uid;
 
   @override
   void initState() {
@@ -278,11 +281,25 @@ class _FixedDetailScreenState extends State<_FixedDetailScreen> {
                               ),
                             ),
                             const Spacer(),
-                            const Icon(
-                              Icons.chat_outlined,
-                              size: MyApp.kDefaultIconSize,
-                              color: Colors.grey,
-                            ),
+                            _currentId == widget.model.uid
+                                ? Container()
+                                : IconButton(
+                                    icon: const Icon(
+                                      Icons.chat_outlined,
+                                      size: MyApp.kDefaultIconSize,
+                                      color: Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pushNamed(
+                                          Routes.conversationScreen,
+                                          arguments: ChatArgs(
+                                            state.userInfoModel!.name as String,
+                                            state.userInfoModel!.image
+                                                as String,
+                                            widget.model.uid as String,
+                                          ));
+                                    },
+                                  ),
                             const SizedBox(width: 10),
                           ],
                         );

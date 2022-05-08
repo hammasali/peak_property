@@ -22,6 +22,7 @@ class UserInfoModel {
       'phoneNo': phoneNo,
       'username': username,
       'aboutUser': aboutUser,
+      'image' : image
     };
   }
 
