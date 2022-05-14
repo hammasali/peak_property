@@ -23,6 +23,8 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
   final TextEditingController amount = TextEditingController();
 
   late final Stream<QuerySnapshot> _stream;
+  final _currentId = FirebaseRepo.instance.getCurrentUser()?.uid;
+
   BidersModel? starBider;
 
   @override
@@ -153,7 +155,8 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                                     ),
                                   ),
                                 ),
-                                widget.args.timerFinished
+                                widget.args.timerFinished &&
+                                        _currentId != starBider!.uid
                                     ? InkWell(
                                         onTap: () {
                                           FirebaseRepo.instance
