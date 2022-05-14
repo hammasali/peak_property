@@ -300,7 +300,7 @@ class _ChatSingleScreenState extends State<ChatSingleScreen> {
 
     ///This is to get the bottom of list when new message arrives. It will call
     ///every time whenever the setState calls / UI change
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       _listController!.animateTo(_listController!.position.maxScrollExtent,
           duration: const Duration(microseconds: 250), curve: Curves.easeInOut);
     });
@@ -413,7 +413,6 @@ class _ChatSingleScreenState extends State<ChatSingleScreen> {
 //     sendImage(edited);
 //   }
 //
-// //TODO: HAndle error after aftar
 //   @override
 //   Future getImage() async {
 //     List<Uint8List>? images;

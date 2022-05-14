@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:peak_property/business_logic/bloc/bid_bloc/bid_bloc.dart';
+import 'package:peak_property/business_logic/cubit/carouselCubit/carousel_cubit.dart';
 import 'package:peak_property/business_logic/cubit/edit_profile_cubit/edit_profile_cubit.dart';
 import 'package:peak_property/core/my_app.dart';
 import 'package:peak_property/core/routes.dart';
@@ -29,6 +30,8 @@ class _BidDetailsState extends State<BidDetails>
   late String? _currentUserImage;
   String? name;
   final _currentId = FirebaseRepo.instance.getCurrentUser()?.uid;
+  late final DateTime endingTime;
+  bool timerFinished = false;
 
   @override
   void initState() {
@@ -39,6 +42,8 @@ class _BidDetailsState extends State<BidDetails>
         .getUserProfile(widget.model.uid.toString());
 
     _getCurrentUserProfilePic();
+
+    endingTime = DateTime.parse(widget.model.endingTime as String);
   }
 
   @override
@@ -162,9 +167,8 @@ class _BidDetailsState extends State<BidDetails>
               enlargeCenterPage: true,
               scrollDirection: Axis.horizontal,
               onPageChanged: (index, reason) {
-                setState(() {
-                  _current = index;
-                });
+                BlocProvider.of<CarouselCubit>(context).currentSlide(index);
+                _current = context.read<CarouselCubit>().state;
               }),
           itemBuilder: (ctx, index, realIdx) {
             if (url.isEmpty) {
@@ -196,25 +200,29 @@ class _BidDetailsState extends State<BidDetails>
           },
         ),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: url.asMap().entries.map((entry) {
-            return GestureDetector(
-              onTap: () => _controller.animateToPage(entry.key),
-              child: Container(
-                width: 12.0,
-                height: 12.0,
-                margin:
-                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: (Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black)
-                        .withOpacity(_current == entry.key ? 0.9 : 0.4)),
-              ),
+        BlocBuilder<CarouselCubit, int>(
+          builder: (context, state) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: url.asMap().entries.map((entry) {
+                return GestureDetector(
+                  onTap: () => _controller.animateToPage(entry.key),
+                  child: Container(
+                    width: 12.0,
+                    height: 12.0,
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 4.0),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black)
+                            .withOpacity(_current == entry.key ? 0.9 : 0.4)),
+                  ),
+                );
+              }).toList(),
             );
-          }).toList(),
+          },
         ),
         const SizedBox(height: 20.0),
 
@@ -228,6 +236,7 @@ class _BidDetailsState extends State<BidDetails>
           ),
         ),
         const SizedBox(height: 5.0),
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Container(
@@ -238,11 +247,10 @@ class _BidDetailsState extends State<BidDetails>
                 borderRadius: BorderRadius.circular(12.0)),
             child: TimerCountdown(
               format: CountDownTimerFormat.daysHoursMinutesSeconds,
-              endTime: DateTime.now().add(
-                const Duration(seconds: 10),
-              ),
+              endTime: endingTime,
               onEnd: () {
                 print("Timer finished");
+                timerFinished = true;
               },
               timeTextStyle: const TextStyle(
                 color: Colors.black,
@@ -354,8 +362,8 @@ class _BidDetailsState extends State<BidDetails>
               label: 'Place a bid',
               onTap: () {
                 Navigator.of(context).pushNamed(Routes.placeBid,
-                    arguments:
-                        BidArgs(_currentUserImage, widget.model.docId, widget.model.uid));
+                    arguments: BidArgs(_currentUserImage, widget.model.docId,
+                        widget.model.uid, timerFinished));
               },
             )),
           ),

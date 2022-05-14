@@ -53,7 +53,8 @@ class UploadButtonEvent extends UploadEvent {
       areaType,
       bedrooms,
       bathrooms,
-      bidTime;
+      bidTime,
+      endingTime;
   final int? preference;
   final double? timeRange;
 
@@ -76,5 +77,6 @@ class UploadButtonEvent extends UploadEvent {
       this.bedrooms,
       this.bathrooms,
       this.preference,
+      this.endingTime,
       this.pickedFile});
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:animation_wrappers/animation_wrappers.dart';
 import 'package:chips_choice_null_safety/chips_choice_null_safety.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,6 +45,7 @@ class _UploadState extends State<Upload> {
   double maxTime = 9;
   int timeDivision = 8;
   String bidTime = '1 day';
+  DateTime endingTime = DateTime.now().add(const Duration(days: 1));
 
   double currentArea = 300;
   double minArea = 0;
@@ -598,9 +600,7 @@ class _UploadState extends State<Upload> {
               divisions: timeDivision,
               label: timeframeRange(currentTime.round()),
               onChanged: (value) {
-                print(bidTime);
                 bidTime = timeframeRange(value.round());
-                print(bidTime);
                 BlocProvider.of<UploadBloc>(context)
                     .add(TimeFrameEvent(value.round()));
                 // currentTime = value.roundToDouble();
@@ -923,22 +923,31 @@ class _UploadState extends State<Upload> {
   timeframeRange(int value) {
     switch (value) {
       case 1:
+        endingTime = DateTime.now().add(const Duration(hours: 6));
         return '6 hr';
       case 2:
+        endingTime = DateTime.now().add(const Duration(hours: 12));
         return '12 hr';
       case 3:
+        endingTime = DateTime.now().add(const Duration(days: 1));
         return '1 day';
       case 4:
+        endingTime = DateTime.now().add(const Duration(days: 2));
         return '2 days';
       case 5:
+        endingTime = DateTime.now().add(const Duration(days: 3));
         return '3 days';
       case 6:
+        endingTime = DateTime.now().add(const Duration(days: 4));
         return '4 days';
       case 7:
+        endingTime = DateTime.now().add(const Duration(days: 5));
         return '5 days';
       case 8:
+        endingTime = DateTime.now().add(const Duration(days: 6));
         return '6 days';
       case 9:
+        endingTime = DateTime.now().add(const Duration(days: 7));
         return '1 week';
     }
   }
@@ -1102,6 +1111,7 @@ class _UploadState extends State<Upload> {
                 addressController.text.isNotEmpty) {
               if (tittleController.text.isNotEmpty &&
                   descriptionController.text.isNotEmpty) {
+
                 BlocProvider.of<UploadBloc>(context).add(UploadButtonEvent(
                     state: stateValue,
                     city: cityValue,
@@ -1114,6 +1124,7 @@ class _UploadState extends State<Upload> {
                     endPrice: endController.text,
                     timeRange: currentTime,
                     bidTime: bidTime,
+                    endingTime: endingTime.toString(),
                     startPrice: startController.text,
                     areaRange: areaController.text,
                     areaType: _selectedAreaUnit,

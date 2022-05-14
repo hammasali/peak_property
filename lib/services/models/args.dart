@@ -7,7 +7,8 @@ class ChatArgs {
 }
 
 class BidArgs {
-  String? image, docId, uid;
+  String? currentUserImage, docId, uid;
+  bool timerFinished;
 
-  BidArgs(this.image, this.docId, this.uid);
+  BidArgs(this.currentUserImage, this.docId, this.uid, this.timerFinished);
 }

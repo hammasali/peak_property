@@ -93,26 +93,27 @@ class _AppNavigationState extends State<AppNavigation>
           navList[_bottomNavIndex],
           style: const TextStyle(color: Colors.black),
         ),
-        leading: IconButton(
-          onPressed: () {
-            showModalBottomSheet(
-                context: context,
-                enableDrag: true,
-                elevation: 1.1,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(30.0))),
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                backgroundColor: Colors.white,
-                builder: (context) => const Search());
-          },
-          icon: const Icon(
-            FontAwesomeIcons.search,
-            size: MyApp.kDefaultIconSize - 5,
-            color: Colors.black,
-          ),
-        ),
+        // leading: IconButton(
+        //   onPressed: () {
+        //     showModalBottomSheet(
+        //         context: context,
+        //         enableDrag: true,
+        //         elevation: 1.1,
+        //         isScrollControlled: true,
+        //         shape: const RoundedRectangleBorder(
+        //             borderRadius:
+        //                 BorderRadius.vertical(top: Radius.circular(30.0))),
+        //         clipBehavior: Clip.antiAliasWithSaveLayer,
+        //         backgroundColor: Colors.white,
+        //         builder: (context) => const Search());
+        //   },
+        //   icon: const Icon(
+        //     FontAwesomeIcons.search,
+        //     size: MyApp.kDefaultIconSize - 5,
+        //     color: Colors.black,
+        //   ),
+        // ),
+        leading: const Image(image: AssetImage('assets/pp.png')),
         iconTheme: const IconThemeData(color: Colors.black),
         backgroundColor: MyApp.kDefaultBackgroundColorWhite,
         centerTitle: true,
@@ -174,7 +175,6 @@ class _AppNavigationState extends State<AppNavigation>
     );
   }
 }
-
 
 class HexColor extends Color {
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));

@@ -1,4 +1,3 @@
-
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
@@ -66,7 +65,10 @@ class BidBloc extends Bloc<BidEvent, BidState> {
         Timestamp _createdAt = Timestamp.now();
 
         BidersModel model = BidersModel(
-            image: event.image, price: event.price, createdAt: _createdAt);
+            image: event.image,
+            price: event.price,
+            createdAt: _createdAt,
+            uid: FirebaseRepo.instance.getCurrentUser()!.uid);
 
         await FirebaseRepo.instance.biders(event.docId, model, event.uid);
 

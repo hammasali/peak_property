@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:peak_property/business_logic/bloc/bid_bloc/bid_bloc.dart';
 import 'package:peak_property/core/my_app.dart';
+import 'package:peak_property/core/routes.dart';
 import 'package:peak_property/custom/custom_button.dart';
 import 'package:peak_property/services/models/args.dart';
 import 'package:peak_property/services/models/bider_model.dart';
@@ -22,6 +23,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
   final TextEditingController amount = TextEditingController();
 
   late final Stream<QuerySnapshot> _stream;
+  BidersModel? starBider;
 
   @override
   void initState() {
@@ -56,15 +58,20 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
               icon: const Icon(Icons.arrow_back_ios_rounded)),
         ),
         actions: [
-          TextButton(
-              onPressed: () => _showDialog(context),
-              child: Text(
-                'Place a bid',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText1
-                    ?.copyWith(fontSize: 16.0, letterSpacing: 1.1),
-              )),
+          widget.args.timerFinished
+              ? const Image(
+                  image: AssetImage('assets/pp.png'),
+                  fit: BoxFit.scaleDown,
+                  height: 100)
+              : TextButton(
+                  onPressed: () => _showDialog(context),
+                  child: Text(
+                    'Place a bid',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1
+                        ?.copyWith(fontSize: 16.0, letterSpacing: 1.1),
+                  )),
           const SizedBox(width: 24.0)
         ],
       ),
@@ -73,13 +80,9 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
               return const Center(child: Text('Something went wrong'));
-            }
-
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: getCircularProgress());
-            }
-
-            if (!snapshot.hasData) {
+            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return Center(
                   child: Text(
                 'No one has bid yet, Place your bid.',
@@ -88,63 +91,185 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                     .headline5
                     ?.copyWith(fontSize: 16),
               ));
-            }
+            } else {
+              var _starBider = snapshot.data!.docs;
+              if (_starBider.isNotEmpty) {
+                _starBider.sort((a, b) => int.parse(a.get('price'))
+                    .compareTo(int.parse(b.get('price'))));
+                starBider = BidersModel.fromMap(
+                    _starBider.last.data() as Map<String, dynamic>);
+              }
 
-            return GridView(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: MyApp.kDefaultPadding / 2),
-              physics: const BouncingScrollPhysics(),
-              shrinkWrap: true,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: result,
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 12.0,
-                  mainAxisSpacing: 20.0),
-              children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                BidersModel model = BidersModel.fromMap(
-                    document.data()! as Map<String, dynamic>);
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    /// ----------- Star Biders -------------
 
-                return FadedScaleAnimation(
-                  fadeCurve: Curves.linearToEaseOut,
-                  child: Container(
-                    padding: const EdgeInsets.only(top: 4.0, bottom: 2.0),
-                    decoration: BoxDecoration(
-                        border: Border.all(width: 1.0, color: Colors.grey),
-                        borderRadius: BorderRadius.circular(12.0)),
-                    child: Column(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12.0),
-                          child: Image.network(
-                            model.image as String,
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(
-                              left: 8.0, right: 8.0, top: 8.0),
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                              border: Border.all(width: 2.0),
-                              borderRadius: BorderRadius.circular(12.0)),
-                          child: Center(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                model.price as String,
-                                style: Theme.of(context).textTheme.bodyText1,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8.0),
+                      child: Text(
+                        'Star Bider',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
+                    const SizedBox(height: 5.0),
+                    FadedScaleAnimation(
+                      fadeCurve: Curves.linearToEaseOut,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 50.0),
+                        padding: const EdgeInsets.only(top: 4.0, bottom: 2.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12.0),
+                              child: Image.network(
+                                starBider!.image as String,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0, top: 8.0),
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(width: 2.0),
+                                      borderRadius:
+                                          BorderRadius.circular(12.0)),
+                                  child: Center(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        starBider!.price as String,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                widget.args.timerFinished
+                                    ? InkWell(
+                                        onTap: () {
+                                          FirebaseRepo.instance
+                                              .getUserProfile(
+                                                  starBider!.uid.toString())
+                                              .get()
+                                              .then((value) {
+                                            Navigator.of(context).pushNamed(
+                                                Routes.conversationScreen,
+                                                arguments: ChatArgs(
+                                                  value.get('name'),
+                                                  starBider!.image as String,
+                                                  starBider!.uid as String,
+                                                ));
+                                          });
+                                        },
+                                        child: Container(
+                                          margin: const EdgeInsets.only(
+                                              left: 8.0, right: 8.0, top: 8.0),
+                                          padding: const EdgeInsets.all(8.0),
+                                          decoration: BoxDecoration(
+                                              color: Colors.black,
+                                              border: Border.all(width: 2.0),
+                                              borderRadius:
+                                                  BorderRadius.circular(12.0)),
+                                          child: Center(
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                'Message',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1!
+                                                    .copyWith(
+                                                        color: Colors.white),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Container()
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                );
-              }).toList(),
-            );
+                    const Divider(),
+
+                    /// ----------- Biders -------------
+
+                    GridView(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: MyApp.kDefaultPadding / 2),
+                      physics: const BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          childAspectRatio: result,
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 12.0,
+                          mainAxisSpacing: 20.0),
+                      children:
+                          snapshot.data!.docs.map((DocumentSnapshot document) {
+                        BidersModel model = BidersModel.fromMap(
+                            document.data()! as Map<String, dynamic>);
+
+                        return FadedScaleAnimation(
+                          fadeCurve: Curves.linearToEaseOut,
+                          child: Container(
+                            padding:
+                                const EdgeInsets.only(top: 4.0, bottom: 2.0),
+                            decoration: BoxDecoration(
+                                border:
+                                    Border.all(width: 1.0, color: Colors.grey),
+                                borderRadius: BorderRadius.circular(12.0)),
+                            child: Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  child: Image.network(
+                                    model.image as String,
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0, top: 8.0),
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(width: 2.0),
+                                      borderRadius:
+                                          BorderRadius.circular(12.0)),
+                                  child: Center(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        model.price as String,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    )
+                  ],
+                ),
+              );
+            }
           }),
     );
   }
@@ -208,7 +333,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                         if (amount.text.isNotEmpty) {
                           BlocProvider.of<BidBloc>(context).add(PlaceBid(
                               amount.text,
-                              widget.args.image as String,
+                              widget.args.currentUserImage as String,
                               widget.args.docId as String,
                               widget.args.uid as String));
                         } else {

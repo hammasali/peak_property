@@ -23,6 +23,7 @@ class UploadModel {
   String? uid;
   String? docId;
   String? thumbnail;
+  String? endingTime;
   List<dynamic>? pickedFilesName;
   List<XFile>? pickedFile;
 
@@ -39,6 +40,7 @@ class UploadModel {
       this.endPrice,
       this.timeRange,
       this.bidTime,
+      this.endingTime,
       this.areaRange,
       this.areaType,
       this.bedrooms,
@@ -64,13 +66,14 @@ class UploadModel {
       'startPrice': startPrice,
       'endPrice': endPrice,
       'timeRange': timeRange,
-      'bidTime' : bidTime,
+      'bidTime': bidTime,
       'areaRange': areaRange,
       'areaType': areaType,
       'bedrooms': bedrooms,
       'bathrooms': bathrooms,
       'createdAt': createdAt,
       'pickedFilesName': pickedFilesName,
+      'endingTime': endingTime,
     };
   }
 
@@ -90,6 +93,8 @@ class UploadModel {
         endPrice: map['endPrice'] as String,
         timeRange: map['timeRange'] as double,
         bidTime: map['bidTime'] as String,
+        //TODO : Remove the null operator
+        endingTime: map['endingTime']??'',
         areaRange: map['areaRange'] as String,
         areaType: map['areaType'] as String,
         bedrooms: map['bedrooms'] as String,
